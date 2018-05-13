@@ -21,6 +21,12 @@ class Scene1 extends Phaser.Scene {
         // Status Bars
         this.load.image('statusBar100', 'assets/sprites/Status_Bars/Status_Bar100.png');
         this.load.image('statusBar0', 'assets/sprites/Status_Bars/Status_Bar0.png')
+
+        this.load.image('scrollUp', 'assets/sprites/icons/scroll_up_button.gif');
+        this.load.image('scrollDown', 'assets/sprites/icons/scroll_down_button.gif');
+
+        this.neon = "#39FF14"
+
     }
     
     create() {
@@ -36,6 +42,8 @@ class Scene1 extends Phaser.Scene {
         this.image = this.add.image(850 / 2, 750 / 2, 'dark-background');
 	    this.image1 = this.add.image(512 / 2, (480 / 2) + 30, 'background');
         this.image2 = this.add.image(325 / 2 + 520, 619 / 2, 'user-interface');
+        this.scrollUp = this.add.image(465, 600, 'scrollUp')
+        this.scrollDown = this.add.image(465, 640, 'scrollDown')
         
         this.hero = this.add.sprite(300, 300, 'hero');
 
@@ -56,11 +64,28 @@ class Scene1 extends Phaser.Scene {
         // this.healthbar.cropEnabled = true;
 
         // shows hero levels on screen
-        this.heroPowerLvText = this.add.text(670, 110, this.hero.power, {font:"24px Ariel", color:"Green"});
+        this.heroPowerLvText = this.add.text(670, 110, this.hero.power, {font:"24px Ariel", color:this.neon});
         
         this.heroDefenseLvText = this.add.text(670, 160, this.hero.defense, {font:"24px Ariel", color:"Blue"});
 
         this.heroHealthLvText = this.add.text(670, 220, this.hero.health, {font:"24px Ariel", color:"Red"});
+
+        // Damage text
+        this.heroDamageText = this.add.text(-20, 20, "", {font:"18px 'Ariel Bold'", color:"Red"});
+        this.enemyDamageText = this.add.text(-20, 20, "", {font:"18px 'Ariel Bold'", color:"Red"});
+
+        // History Log
+        this.historyTextHeading = this.add.text(20, 513, "History:", {font:"20px Ariel"});
+        this.historyTextLine = this.add.text(10, 528, "-----------------------------------------------")
+        this.historyTextLine1 = this.add.text(40, 545, "Line 1 of history log", {font:"16px Ariel Bold"});
+        this.historyTextLine2 = this.add.text(40, 570, "Line 2 of history log", {font:"16px Ariel"});
+        this.historyTextLine3 = this.add.text(40, 595, "Line 3 of history log", {font:"16px Ariel"});
+        this.historyTextLine4 = this.add.text(40, 620, "Line 4 of history log", {font:"16px Ariel"});
+        this.historyTextLine5 = this.add.text(40, 645, "Line 5 of history log", {font:"16px Ariel"});
+        this.historyTextLine6 = this.add.text(40, 670, "Line 6 of history log", {font:"16px Ariel"});
+
+        this.historyLineTextList = [];
+        this.historyLineTextColor = [];
 
         this.goblin = this.add.sprite(100, 100, 'goblin').setInteractive(); // set interactive allows pointerover event
 
@@ -181,6 +206,8 @@ class Scene1 extends Phaser.Scene {
             this.statusBarEnemy100.y= -40;
             this.statusBarHero0.y = -40;
             this.statusBarEnemy0.y = -40;
+            this.heroDamageText.y = -50;
+            this.enemyDamageText.y = -50;
 
         }
 
@@ -189,29 +216,57 @@ class Scene1 extends Phaser.Scene {
 
             // Changes status bar when taking damage
             this.statusBarHero0.x = this.hero.x;
-            this.statusBarHero0.y = this.hero.y - 40;
+            this.statusBarHero0.y = this.hero.y - 30;
             this.statusBarHero100.x = this.hero.x - (((this.hero.maxhealth - this.hero.health ) * (23 / this.hero.maxhealth))/2); // Formula prevents the green bar from centering as it shrinks
-            this.statusBarHero100.y = this.hero.y - 40;
+            this.statusBarHero100.y = this.hero.y - 30;
             this.statusBarHero100.displayWidth =  (this.hero.health / this.hero.maxhealth) * 23;
 
             this.statusBarEnemy0.x = this.goblin.x;
-            this.statusBarEnemy0.y = this.goblin.y - 40;
+            this.statusBarEnemy0.y = this.goblin.y - 30;
             this.statusBarEnemy100.x = this.goblin.x - (((this.goblin.maxhealth - this.goblin.health ) * (23 / this.goblin.maxhealth))/2);
-            this.statusBarEnemy100.y = this.goblin.y - 40;
+            this.statusBarEnemy100.y = this.goblin.y - 30;
             this.statusBarEnemy100.displayWidth =  (this.goblin.health / this.goblin.maxhealth) * 23;
 
             if (this.attackTimer == 190) {
-                var attackPower = Math.floor(Math.random() * this.hero.power + 1);
-                attackPower = Math.min(attackPower, this.goblin.health);
-                console.log("Hero attacks goblin :", attackPower);
-                this.goblin.health -= attackPower;
+                this.attackPower = Math.floor(Math.random() * (this.hero.power + 1));
+                this.attackPower = Math.min(this.attackPower, this.goblin.health);
+                // console.log("Hero attacks goblin :", this.attackPower);
+                this.goblin.health -= this.attackPower;
+                // Sets attack number color
+                if (this.attackPower == 0) {
+                    this.damageColor = "blue"
+                }
+                else {
+                    this.damageColor = "red"
+                }
+                this.historyLineTextList.unshift(`Hero does ${this.attackPower} damage to ${this.goblin.name}`);
+                this.historyLineTextColor.unshift(this.neon);
             }
             if (this.attackTimer == 90) {
-                var attackPower = Math.floor(Math.random() * this.goblin.power + 1);
-                attackPower = Math.min(attackPower, this.hero.health);
-                this.hero.health -= attackPower;
-                console.log("Goblin attacks hero :", attackPower);
+                this.enemyAttackPower = Math.floor(Math.random() * (this.goblin.power + 1));
+                this.enemyAttackPower = Math.min(this.enemyAttackPower, this.hero.health);
+                this.hero.health -= this.enemyAttackPower;
+                // Sets attack number color
+                if (this.enemyAttackPower == 0) {
+                    this.enemyDamageColor = "blue"
+                }
+                else {
+                    this.enemyDamageColor = "red"
+                }
+                this.historyLineTextList.unshift(`${this.goblin.name} does ${this.enemyAttackPower} damage to Hero`);
+                this.historyLineTextColor.unshift("Red");
             }
+
+            // Shows damage above characters head
+            this.heroDamageText.x = this.hero.x - 5;
+            this.heroDamageText.y = this.hero.y - 55;
+            this.heroDamageText.setText(this.enemyAttackPower).setStyle({font:"18px Ariel Bold", color: this.enemyDamageColor});
+
+            this.enemyDamageText.x = this.goblin.x - 5;
+            this.enemyDamageText.y = this.goblin.y - 55;
+            this.enemyDamageText.setText(this.attackPower).setStyle({font:"18px Ariel Bold", color: this.damageColor});;
+
+
             if (this.attackTimer <= 0) {
                 this.attackTimer =  200;
             }
@@ -233,6 +288,15 @@ class Scene1 extends Phaser.Scene {
         this.heroPowerLvText.setText(this.hero.power);
         this.heroDefenseLvText.setText(this.hero.defense);
         this.heroHealthLvText.setText(this.hero.health);
+
+        // Updates history log
+
+        this.historyTextLine1.setText(this.historyLineTextList[5]).setStyle({font:"16px Ariel Bold", color: this.historyLineTextColor[5]});
+        this.historyTextLine2.setText(this.historyLineTextList[4]).setStyle({font:"16px Ariel Bold", color: this.historyLineTextColor[4]});;
+        this.historyTextLine3.setText(this.historyLineTextList[3]).setStyle({font:"16px Ariel Bold", color: this.historyLineTextColor[3]});;
+        this.historyTextLine4.setText(this.historyLineTextList[2]).setStyle({font:"16px Ariel Bold", color: this.historyLineTextColor[2]});;
+        this.historyTextLine5.setText(this.historyLineTextList[1]).setStyle({font:"16px Ariel Bold", color: this.historyLineTextColor[1]});;
+        this.historyTextLine6.setText(this.historyLineTextList[0]).setStyle({font:"16px Ariel Bold", color: this.historyLineTextColor[0]});;
 
     }
 }
