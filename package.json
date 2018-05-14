@@ -1,0 +1,28 @@
+{
+  "name": "hero_rpg_v4_js",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "ejs": "^2.6.1",
+    "express": "^4.16.3",
+    "parcel-bundler": "^1.8.1",
+    "pg-promise": "^8.4.4",
+    "phaser": "^3.7.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Adrian-Jablonski/Hero_RPG_v4.git"
+  },
+  "author": "Adrian",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Adrian-Jablonski/Hero_RPG_v4/issues"
+  },
+  "homepage": "https://github.com/Adrian-Jablonski/Hero_RPG_v4#readme",
+  "description": ""
+}
