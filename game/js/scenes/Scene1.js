@@ -15,8 +15,13 @@ import scrollDown from '/assets/sprites/icons/scroll_down_button.gif';
 
 import radioButton from '/assets/sprites/icons/radiobutton_circle.png';
 
-// Load hero object
-import Hero from '../classes/characters/hero.js'        
+// Load character objects
+import Hero from '../classes/characters/hero.js'  
+import Goblin from '../classes/characters/goblin.js' 
+
+// actions
+import enemyClicked from '../classes/actions/enemyClicked.js'
+import attackStance from '../classes/actions/attackStance.js'
 
 class Scene1 extends Phaser.Scene {
     constructor() {
@@ -65,33 +70,22 @@ class Scene1 extends Phaser.Scene {
         this.scrollDown = this.add.image(465, 610, 'scrollDown');
         this.radioButton = this.add.image(552, 530, 'radioButton');
 
-        this.hero = this.add.sprite(100, 200, 'hero');
-
-        // Hero character
-        this.hero.name = "Hero";
-        this.hero.power = 10;
-        this.hero.defense = 3;
-        this.hero.health = 15;
-        this.hero.maxhealth = 15;
-        this.hero.powerExp = Math.round((25 + (this.hero.power)) * (this.hero.power) / 1.13767) * (this.hero.power - 1);
-        this.hero.defenseExp = Math.round((25 + (this.hero.defense)) * (this.hero.defense) / 1.13767) * (this.hero.defense - 1);
-        this.hero.healthExp = Math.round((25 + (this.hero.health)) * (this.hero.health) / 1.13767) * (this.hero.health - 1);
-        this.hero.attackStance = "Aggressive";
-        this.hero.nextHealthLevelExp = Math.round(((25 + (this.hero.health + 1)) * (this.hero.health + 1) / 1.13767) * this.hero.health);
-        this.hero.nextPowerLevelExp = Math.round(((25 + (this.hero.power + 1)) * (this.hero.power + 1) / 1.13767) * this.hero.power);
-        this.hero.nextDefenseLevelExp = Math.round(((25 + (this.hero.defense + 1)) * (this.hero.defense + 1) / 1.13767) * this.hero.defense);
-        this.hero.coins = 100;
-        this.hero.attackRange = 70;
-        this.hero.battleMode = false;
-
         // http://www.html5gamedevs.com/topic/32411-extending-phasergameobjectssprite-es6/
 
-        // this.hero = new Hero({
-        //     key: 'hero',
-        //     scene: this,
-        //     x: 300,
-        //     y: 300,
-        // });
+        // Creates characters 
+        this.hero = new Hero({
+            key: 'hero',
+            scene: this,
+            x: 100,
+            y: 200,
+        });
+
+        this.goblin = new Goblin({
+            key: 'goblin',
+            scene: this,
+            x: 300,
+            y: 300,
+        }).setInteractive(); // set interactive allows pointerover event
 
         //create hero and enemy health bar off screen
         this.statusBarHero0 = this.add.image(-30, - 40, 'statusBar0');
@@ -138,21 +132,7 @@ class Scene1 extends Phaser.Scene {
         this.historyLineTextColor = [];
         this.historyTextScroll = 0;
 
-        this.goblin = this.add.sprite(300, 300, 'goblin').setInteractive(); // set interactive allows pointerover event
-
-        this.goblin.text = this.add.text(20, 0, "", {font:"24px Ariel", color:"Red"});
-        this.goblin.name = "Goblin";
-        this.goblin.power = 1;
-        this.goblin.defense = 2;
-        this.goblin.health = 8;
-        this.goblin.maxhealth = 8;
-        this.goblin.status = "Alive";
-        this.goblin.respawnTimer = 200;
-        this.goblin.bounty = [5, 5, 6, 6, 8, 10];
-        this.goblin.attackRange = 70;
-        this.goblin.battleMode = false;
-        
-        // this.hero.anchor.setTo(0.5, 0.5);
+        this.goblin.text = this.add.text(20, 0, "", {font:"24px Ariel", color:"Red"}); // Hover text
 
         // // Sets scene border so player does not move off screen (Need to find a way that this works in Phaser3)
         // this.hero.setBounds(0, 0, 800, 600);
@@ -174,14 +154,21 @@ class Scene1 extends Phaser.Scene {
             this.goblin.clickPosition = [this.goblin.x, this.goblin.y];
 
             // checks if enemy was clicked on
-            if (this.mouseClickX >= this.goblin.x - 15 && this.mouseClickX <= this.goblin.x + 15 && this.mouseClickY >= this.goblin.y - 15 && this.mouseClickY <= this.goblin.y + 15 ) {
+            if (enemyClicked(this.mouseClickX, this.mouseClickY, this.goblin, this.gameScreen) == true) {
                 this.attackEnemy = true;
             }
-            else if (this.mouseClickX < this.gameScreen && this.mouseClickX > 0 && this.mouseClickY < this.gameScreen && this.mouseClickY > 0){ // Prevents battle mode being changed by clicks outside game screen
-                // this.battleMode = false;
+            else {
                 this.attackEnemy = false;
                 this.hero.battleMode = false;
             }
+            // if (this.mouseClickX >= this.goblin.x - 15 && this.mouseClickX <= this.goblin.x + 15 && this.mouseClickY >= this.goblin.y - 15 && this.mouseClickY <= this.goblin.y + 15 ) {
+            //     this.attackEnemy = true;
+            // }
+            // else if (this.mouseClickX < this.gameScreen && this.mouseClickX > 0 && this.mouseClickY < this.gameScreen && this.mouseClickY > 0){ // Prevents battle mode being changed by clicks outside game screen
+            //     // this.battleMode = false;
+            //     this.attackEnemy = false;
+            //     this.hero.battleMode = false;
+            // }
 
             console.log("x: ", event.x, " y: ", event.y);
             //console.log("player position :", this.hero.x, this.hero.y);
@@ -200,21 +187,37 @@ class Scene1 extends Phaser.Scene {
             }
 
             // Attack stance button
-            if (this.mouseClickX >= 540 && this.mouseClickX <=565 && this.mouseClickY >= 522 && this.mouseClickY <= 545) {
+            if (attackStance(this.mouseClickX, this.mouseClickY) == "Aggressive") {
                 this.radioButton.x = 552;
                 this.radioButton.y = 530;
                 this.hero.attackStance = "Aggressive";
             }
-            else if (this.mouseClickX >= 682 && this.mouseClickX <= 707 && this.mouseClickY >= 522 && this.mouseClickY <= 545) {
+            else if (attackStance(this.mouseClickX, this.mouseClickY) == "Defensive") {
                 this.radioButton.x = 692;
                 this.radioButton.y = 530;
                 this.hero.attackStance = "Defensive";
             }
-            else if (this.mouseClickX >= 540 && this.mouseClickX <=565 && this.mouseClickY >= 564 && this.mouseClickY <= 591) {
+            else if (attackStance(this.mouseClickX, this.mouseClickY) == "Normal") {
                 this.radioButton.x = 552;
                 this.radioButton.y = 572;
                 this.hero.attackStance = "Normal";
             }
+
+            // if (this.mouseClickX >= 540 && this.mouseClickX <=565 && this.mouseClickY >= 522 && this.mouseClickY <= 545) {
+            //     this.radioButton.x = 552;
+            //     this.radioButton.y = 530;
+            //     this.hero.attackStance = "Aggressive";
+            // }
+            // else if (this.mouseClickX >= 682 && this.mouseClickX <= 707 && this.mouseClickY >= 522 && this.mouseClickY <= 545) {
+            //     this.radioButton.x = 692;
+            //     this.radioButton.y = 530;
+            //     this.hero.attackStance = "Defensive";
+            // }
+            // else if (this.mouseClickX >= 540 && this.mouseClickX <=565 && this.mouseClickY >= 564 && this.mouseClickY <= 591) {
+            //     this.radioButton.x = 552;
+            //     this.radioButton.y = 572;
+            //     this.hero.attackStance = "Normal";
+            // }
             console.log(this.hero.attackStance);
 
 

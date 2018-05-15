@@ -1,5 +1,9 @@
-class Hero {
-    constructor() {
+class Hero extends Phaser.GameObjects.Sprite {
+    constructor(config) {
+        super(config.scene, config.x, config.y, config.key);
+        this.scene = config.scene;
+        this.scene.add.existing(this);
+
         this.name = "Hero";
         this.power = 3;
         this.defense = 1;
@@ -15,8 +19,8 @@ class Hero {
         this.coins = 100;
         this.attackRange = 70;
         this.battleMode = false;
-    }
-    
+
+    }    
 }
 
 export default Hero;
