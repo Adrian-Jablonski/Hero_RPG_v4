@@ -12,6 +12,9 @@ class Hero {
         this.nextHealthLevelExp = Math.round(((25 + (this.health + 1)) * (this.health + 1) / 1.13767) * this.health);
         this.nextPowerLevelExp = Math.round(((25 + (this.power + 1)) * (this.power + 1) / 1.13767) * this.power);
         this.nextDefenseLevelExp = Math.round(((25 + (this.defense + 1)) * (this.defense + 1) / 1.13767) * this.defense);
+        this.coins = 100;
+        this.attackRange = 70;
+        this.battleMode = false;
     }
     
 }
