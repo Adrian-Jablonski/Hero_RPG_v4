@@ -15,6 +15,8 @@ import scrollDown from '/assets/sprites/icons/scroll_down_button.gif';
 
 import radioButton from '/assets/sprites/icons/radiobutton_circle.png';
 
+import healingPotionPic from '/assets/sprites/icons/healing_potion.png';
+
 // Load character objects
 import Hero from '../classes/characters/hero.js'  
 import Goblin from '../classes/characters/goblin.js' 
@@ -47,6 +49,8 @@ class Scene1 extends Phaser.Scene {
 
         this.load.image('radioButton', radioButton);
 
+        this.load.image('healingPotionPic', healingPotionPic);
+
         // Colors 
         this.neon = "#39FF14"
 
@@ -69,6 +73,7 @@ class Scene1 extends Phaser.Scene {
         this.scrollUp = this.add.image(465, 570, 'scrollUp');
         this.scrollDown = this.add.image(465, 610, 'scrollDown');
         this.radioButton = this.add.image(552, 530, 'radioButton');
+        this.healingPotionPic = this.add.image(547, 325, 'healingPotionPic').setInteractive();
 
         // http://www.html5gamedevs.com/topic/32411-extending-phasergameobjectssprite-es6/
 
@@ -122,12 +127,12 @@ class Scene1 extends Phaser.Scene {
         // History Log
         this.historyTextHeading = this.add.text(20, 513, "History:", {font:"20px Ariel"});
         this.historyTextLine = this.add.text(10, 528, "-----------------------------------------------")
-        this.historyTextLine1 = this.add.text(30, 545, "", {font:"16px 'Ariel Bold'"});
-        this.historyTextLine2 = this.add.text(30, 570, "", {font:"16px Ariel"});
-        this.historyTextLine3 = this.add.text(30, 595, "", {font:"16px Ariel"});
-        this.historyTextLine4 = this.add.text(30, 620, "", {font:"16px Ariel"});
-        this.historyTextLine5 = this.add.text(30, 645, "", {font:"16px Ariel"});
-        this.historyTextLine6 = this.add.text(30, 670, "", {font:"16px Ariel"});
+        this.historyTextLine1 = this.add.text(20, 545, "", {font:"14px 'Ariel Bold'"});
+        this.historyTextLine2 = this.add.text(20, 570, "", {font:"14px Ariel"});
+        this.historyTextLine3 = this.add.text(20, 595, "", {font:"14px Ariel"});
+        this.historyTextLine4 = this.add.text(20, 620, "", {font:"14px Ariel"});
+        this.historyTextLine5 = this.add.text(20, 645, "", {font:"14px Ariel"});
+        this.historyTextLine6 = this.add.text(20, 670, "", {font:"14px Ariel"});
 
         this.historyLogCount = this.add.text(440, 635, "0 / 0", {font:"12px Ariel"});
 
@@ -138,6 +143,7 @@ class Scene1 extends Phaser.Scene {
         this.historyTextScroll = 0;
 
         this.goblin.text = this.add.text(20, 0, "", {font:"24px Ariel", color:"Red"}); // Hover text
+        this.healingPotionPic.text = this.add.text(20, 0, "", {font:"24px Ariel", color:"Red"});
 
         // // Sets scene border so player does not move off screen (Need to find a way that this works in Phaser3)
         // this.hero.setBounds(0, 0, 800, 600);
@@ -190,16 +196,22 @@ class Scene1 extends Phaser.Scene {
                 this.radioButton.x = 552;
                 this.radioButton.y = 530;
                 this.hero.attackStance = "Aggressive";
+                this.hero.powerLvAdj = this.hero.power + 3;
+                this.hero.defenseLvAdj = this.hero.defense - 3;
             }
             else if (attackStance(this.mouseClickX, this.mouseClickY) == "Defensive") {
                 this.radioButton.x = 692;
                 this.radioButton.y = 530;
                 this.hero.attackStance = "Defensive";
+                this.hero.powerLvAdj = this.hero.power - 3;
+                this.hero.defenseLvAdj = this.hero.defense + 3;
             }
             else if (attackStance(this.mouseClickX, this.mouseClickY) == "Normal") {
                 this.radioButton.x = 552;
                 this.radioButton.y = 572;
                 this.hero.attackStance = "Normal";
+                this.hero.powerLvAdj = this.hero.power;
+                this.hero.defenseLvAdj = this.hero.defense;
             }
             console.log(this.hero.attackStance);
 
@@ -208,6 +220,12 @@ class Scene1 extends Phaser.Scene {
                 if (this.hero.healingPotion > 0) {
                     this.hero.health = Math.min(this.hero.maxhealth, (this.hero.health + 10));
                     this.hero.healingPotion -= 1;
+                    this.historyLineTextList.unshift(`Hero drinks a healing potion`);
+                    this.historyLineTextColor.unshift("White");
+                    if (this.hero.battleMode == true) {
+                        this.hero.frozen = true;
+                    }
+                    
                 }
             }
 
@@ -302,16 +320,16 @@ class Scene1 extends Phaser.Scene {
         // Enemy follows hero when hero runs away
         if (this.goblin.battleMode == true && this.goblin.status == "Alive") {
             if (this.goblin.x + 40 < this.hero.x) {
-                this.goblin.x += .5;
+                this.goblin.x += this.goblin.speed;
             }
             else if (this.goblin.x - 40 > this.hero.x) {
-                this.goblin.x -= .5;
+                this.goblin.x -= this.goblin.speed;
             }
             if (this.goblin.y + 40 < this.hero.y) {
-                this.goblin.y += .5;
+                this.goblin.y += this.goblin.speed;
             }
             else if (this.goblin.y - 40 > this.hero.y) {
-                this.goblin.y -= .5;
+                this.goblin.y -= this.goblin.speed;
             }
             // disables goblin battle mode once hero runs away too far
             if (this.hero.battleMode == false) {
@@ -364,37 +382,74 @@ class Scene1 extends Phaser.Scene {
             this.statusBarEnemy100.displayWidth =  (this.goblin.health / this.goblin.maxhealth) * 23;
 
             if (this.attackTimer == this.hero.attackTime && this.hero.battleMode == true) {
-                this.attackPower = Math.floor(Math.random() * (this.hero.power + 1));
-                this.attackPower = Math.min(this.attackPower, this.goblin.health);
-                // console.log("Hero attacks goblin :", this.attackPower);
-                this.goblin.health -= this.attackPower;
-                // Sets attack number color
-                if (this.attackPower == 0) {
-                    this.damageColor = "blue"
-                }
-                else {
-                    this.damageColor = "red"
-                }
-                this.historyLineTextList.unshift(`Hero does ${this.attackPower} damage to ${this.goblin.name}`);
-                this.historyLineTextColor.unshift(this.neon);
+            
+                if (this.hero.frozen == false) {
+                    var count = 0;
+                    // Hero special attack
+                    var specialAttackNumb = Math.floor(Math.random() * (1/this.hero.specialAttackPerc));
+                    // console.log(specialAttackNumb);
+                    this.attackPower = Math.floor(Math.random() * (this.hero.powerLvAdj + 1));
+                    console.log(`${count}: Power ${this.attackPower} - Defense Benefit ${Math.max(this.hero.powerLvAdj - this.goblin.defenseBenefit, 1)} -  Defense Times ${this.goblin.defenseTimes}`)
+                    while (this.attackPower > Math.max(this.hero.powerLvAdj - this.goblin.defenseBenefit, 1) && count < this.goblin.defenseTimes){
+                        this.attackPower = Math.floor(Math.random() * (this.hero.powerLvAdj + 1));
+                        this.attackPower = Math.min(this.attackPower, this.goblin.health);
+                        console.log(`${count}: Power ${this.attackPower} - Defense Benefit ${Math.max(this.hero.powerLvAdj - this.goblin.defenseBenefit, 1)} -  Defense Times ${this.goblin.defenseTimes}`)
+                        count += 1;
+                        
+                    }
+                        
+                    if (specialAttackNumb == 0) {
+                        this.attackPower = this.attackPower = Math.min(this.attackPower * 2, this.goblin.health);
+                        this.historyLineTextList.unshift(`SPECIAL ATTACK: Hero does ${this.attackPower} damage to ${this.goblin.name}`);
+                    }
+                    else {
+                        this.historyLineTextList.unshift(`Hero does ${this.attackPower} damage to ${this.goblin.name}`);
+                        
+                    }
 
-                // Experience points
-                if (this.hero.attackStance == "Aggressive") {
-                    this.hero.powerExp += Math.round(this.attackPower * 3.7);
-                    this.hero.healthExp += Math.round(this.attackPower * 1.5);
+                    // console.log("Hero attacks goblin :", this.attackPower);
+                    this.goblin.health -= this.attackPower;
+                    // Sets attack number color
+                    if (this.attackPower == 0) {
+                        this.damageColor = "blue"
+                    }
+                    else {
+                        this.damageColor = "red"
+                    }
+                    // this.historyLineTextList.unshift(`Hero does ${this.attackPower} damage to ${this.goblin.name}`);
+                    this.historyLineTextColor.unshift(this.neon);
+
+                    // Experience points
+                    if (this.hero.attackStance == "Aggressive") {
+                        this.hero.powerExp += Math.round(this.attackPower * 3.7);
+                        this.hero.healthExp += Math.round(this.attackPower * 1.5);
+                        this.hero.powerStanceBonus = 3;
+                    }
+                    else if (this.hero.attackStance == "Defensive") {
+                        this.hero.defenseExp += Math.round(this.attackPower * 3.7);
+                        this.hero.healthExp += Math.round(this.attackPower * 1.5);
+                    }
+                    else if (this.hero.attackStance == "Normal") {
+                        this.hero.powerExp += Math.round(this.attackPower * 1.5);
+                        this.hero.defenseExp += Math.round(this.attackPower * 1.5);
+                        this.hero.healthExp += Math.round(this.attackPower * 2.0);
+                    }
                 }
-                else if (this.hero.attackStance == "Defensive") {
-                    this.hero.defenseExp += Math.round(this.attackPower * 3.7);
-                    this.hero.healthExp += Math.round(this.attackPower * 1.5);
-                }
-                else if (this.hero.attackStance == "Normal") {
-                    this.hero.powerExp += Math.round(this.attackPower * 1.5);
-                    this.hero.defenseExp += Math.round(this.attackPower * 1.5);
-                    this.hero.healthExp += Math.round(this.attackPower * 2.0);
+                if (this.hero.frozen == true) {
+                    this.hero.frozen = false;
                 }
             }
             if (this.attackTimer == this.goblin.attackTime && this.goblin.battleMode == true) {
+                var count = 0;
+                // console.log(`${count}: Power ${this.enemyAttackPower} - Defense Benefit ${Math.max(this.goblin.power - this.hero.defenseBenefit, 1)} -  Defense Times ${this.hero.defenseTimes}`)
                 this.enemyAttackPower = Math.floor(Math.random() * (this.goblin.power + 1));
+                while (this.enemyAttackPower > Math.max(this.goblin.power - this.hero.defenseBenefit, 1) && count < this.hero.defenseTimes){
+                    this.enemyAttackPower = Math.floor(Math.random() * (this.goblin.power + 1));
+                    this.enemyAttackPower = Math.min(this.enemyAttackPower, this.hero.health);
+                    // console.log(`${count}: Power ${this.enemyAttackPower} - Defense Benefit ${Math.max(this.goblin.power - this.hero.defenseBenefit, 1)} -  Defense Times ${this.hero.defenseTimes}`)
+                    count += 1;
+                }
+                
                 this.enemyAttackPower = Math.min(this.enemyAttackPower, this.hero.health);
                 this.hero.health -= this.enemyAttackPower;
                 // Sets attack number color
@@ -439,7 +494,9 @@ class Scene1 extends Phaser.Scene {
             else if (this.hero.health <= 0) {
                 this.hero.x = 300;
                 this.hero.y = 300;
-                this.hero.health = this.hero.maxhealth
+                this.hero.health = this.hero.maxhealth;
+                this.mouseClickX = 300;
+                this.mouseClickY = 300;
             }
             this.hero.battleMode = false;
             this.goblin.battleMode = false;
@@ -463,11 +520,14 @@ class Scene1 extends Phaser.Scene {
         if (this.hero.powerExp >= this.hero.nextPowerLevelExp) {
             this.hero.power += 1;
             this.hero.nextPowerLevelExp = Math.round(((25 + (this.hero.power + 1)) * (this.hero.power + 1) / 1.13767) * this.hero.power);
+            this.powerLvAdj += 1;
         }
         if (this.hero.defenseExp >= this.hero.nextDefenseLevelExp) {
             this.hero.defense += 1;
             this.hero.nextDefenseLevelExp = Math.round(((25 + (this.hero.defense + 1)) * (this.hero.defense + 1) / 1.13767) * this.hero.defense);
-            
+            this.hero.defenseBenefit = Math.round(this.hero.defense * .2);
+            this.hero.defenseTimes = Math.round(this.hero.defense / 4);
+            this.defenseLvAdj += 1;
         }
         if (this.hero.healthExp >= this.hero.nextHealthLevelExp) {
             this.hero.health += 1;
@@ -482,7 +542,13 @@ class Scene1 extends Phaser.Scene {
             this.text.setText(`Attack ${this.name}. (Power: ${this.power} Defense: ${this.defense} Health: ${this.health})`);
         })
         this.goblin.on('pointerout', function(pointer) {
-            this.text.setText("");
+            this.text.setText('');
+        })
+        this.healingPotionPic.on('pointerover', function(pointer) {
+            this.text.setText(`Click to drink healing potion`);
+        })
+        this.healingPotionPic.on('pointerout', function(pointer) {
+            this.text.setText('')
         })
 
         // Updates hero levels on screen
