@@ -5,6 +5,12 @@ import userInterface from '/assets/sprites/background-images/user_interface.png'
  // Characters
 import heroImage from '/assets/sprites/characters/hero.png';
 import goblin from '/assets/sprites/characters/goblin.png';
+import deathKnight from '/assets/sprites/characters/deathKnight.png';
+
+// Load character objects
+import Hero from '../classes/characters/hero.js'; 
+import Goblin from '../classes/characters/goblin.js';
+import DeathKnight from '../classes/characters/deathKnight.js';
 
  // Status Bars
 import statusBar100 from '/assets/sprites/Status_Bars/Status_Bar100.png';
@@ -16,10 +22,6 @@ import scrollDown from '/assets/sprites/icons/scroll_down_button.gif';
 import radioButton from '/assets/sprites/icons/radiobutton_circle.png';
 
 import healingPotionPic from '/assets/sprites/icons/healing_potion.png';
-
-// Load character objects
-import Hero from '../classes/characters/hero.js'  
-import Goblin from '../classes/characters/goblin.js' 
 
 // actions
 import enemyClicked from '../classes/actions/enemyClicked.js'
@@ -39,6 +41,7 @@ class Scene1 extends Phaser.Scene {
         // Characters
         this.load.image('hero', heroImage, 41, 55);
         this.load.image('goblin', goblin, 32, 32);
+        this.load.image('deathKnight', deathKnight);
 
         // Status Bars
         this.load.image('statusBar100', statusBar100);
@@ -65,6 +68,8 @@ class Scene1 extends Phaser.Scene {
         this.mouseClicked = false;
         // this.battleMode = false;
         this.attackTimer = 200;
+        this.enemyFighting = "";
+        this.deadEnemyList = [];
 
         // Renders images and sprites to screen
         this.image = this.add.image(850 / 2, 700 / 2, 'dark-background');
@@ -88,11 +93,32 @@ class Scene1 extends Phaser.Scene {
         this.goblin = new Goblin({
             key: 'goblin',
             scene: this,
-            walkAreaX : [100, 300],
+            walkAreaX : [100, 200],
             walkAreaY : [100, 300],
             x: 150,
             y: 150,
         }).setInteractive(); // set interactive allows pointerover event
+
+        this.goblin1 = new Goblin({
+            key: 'goblin',
+            scene: this,
+            walkAreaX : [100, 200],
+            walkAreaY : [300, 400],
+            x: 150,
+            y: 350,
+        }).setInteractive(); // set interactive allows pointerover event
+
+        this.deathKnight = new DeathKnight({
+            key: 'deathKnight',
+            scene: this,
+            walkAreaX : [300, 400],
+            walkAreaY : [200, 400],
+            x: 350,
+            y: 250,
+        }).setInteractive(); // set interactive allows pointerover event
+
+        this.enemies = [this.goblin, this.deathKnight, this.goblin1];
+        // this.enemies = [this.goblin];
 
         //create hero and enemy health bar off screen
         this.statusBarHero0 = this.add.image(-30, - 40, 'statusBar0');
@@ -142,7 +168,9 @@ class Scene1 extends Phaser.Scene {
         this.historyLineTextColor = [];
         this.historyTextScroll = 0;
 
-        this.goblin.text = this.add.text(20, 0, "", {font:"24px Ariel", color:"Red"}); // Hover text
+        for (var i = 0; i < this.enemies.length; i ++) {
+            this.enemies[i].text = this.add.text(20, 0, "", {font:"24px Ariel", color:"Red"}); // Hover text
+        }
         this.healingPotionPic.text = this.add.text(20, 0, "", {font:"24px Ariel", color:"Red"});
 
         // // Sets scene border so player does not move off screen (Need to find a way that this works in Phaser3)
@@ -157,22 +185,40 @@ class Scene1 extends Phaser.Scene {
         
         // Handles click events
         this.input.on('pointerdown', function(event) {
+
+            for (var i = 0; i < this.enemies.length; i ++) {
+                this.enemies[i].clickPosition = [this.enemies[i].x, this.enemies[i].y];
+            }
+
             // Moves player to click location
             console.log(this.attackTimer);
             this.mouseClickX = event.x;
             this.mouseClickY = event.y;
             this.mouseClicked = true;
             // stores enemy position on click
-            this.goblin.clickPosition = [this.goblin.x, this.goblin.y];
+            // this.goblin.clickPosition = [this.goblin.x, this.goblin.y];
 
             // checks if enemy was clicked on
-            if (enemyClicked(this.mouseClickX, this.mouseClickY, this.goblin, this.gameScreen) == true) {
-                this.attackEnemy = true;
+            for (var i = 0; i < this.enemies.length; i ++) {
+                if (enemyClicked(this.mouseClickX, this.mouseClickY, this.enemies[i], this.gameScreen) == true) {
+                    this.attackEnemy = true;
+                    this.enemyFighting = this.enemies[i];
+                    console.log(this.enemyFighting);
+                    break; // breaks out of loop so that else if does not run and prevent attacking the enemy that was clicked on
+                }
+                else if (enemyClicked(this.mouseClickX, this.mouseClickY, this.enemies[i], this.gameScreen) == false){
+                    this.attackEnemy = false;
+                    this.hero.battleMode = false;
+                    // this.enemyFighting = "";
+                }
             }
-            else if (enemyClicked(this.mouseClickX, this.mouseClickY, this.goblin, this.gameScreen) == false){
-                this.attackEnemy = false;
-                this.hero.battleMode = false;
-            }
+            // if (enemyClicked(this.mouseClickX, this.mouseClickY, this.goblin, this.gameScreen) == true) {
+            //     this.attackEnemy = true;
+            // }
+            // else if (enemyClicked(this.mouseClickX, this.mouseClickY, this.goblin, this.gameScreen) == false){
+            //     this.attackEnemy = false;
+            //     this.hero.battleMode = false;
+            // }
 
             console.log("x: ", event.x, " y: ", event.y);
             //console.log("player position :", this.hero.x, this.hero.y);
@@ -247,20 +293,20 @@ class Scene1 extends Phaser.Scene {
         // this.timer += 1
         // console.log(this.timer)
 
-        // Checks if enemy is within range of attacking
-        if (this.attackEnemy == true || (this.goblin.battleMode == true && this.attackEnemy == true)) {
+        //Checks if enemy is within range of attacking
+        if (this.attackEnemy == true || (this.enemyFighting.battleMode == true && this.attackEnemy == true)) {
             // Has hero chasing enemy 
-            this.mouseClickX = this.goblin.x;
-            this.mouseClickY = this.goblin.y;
+            this.mouseClickX = this.enemyFighting.x;
+            this.mouseClickY = this.enemyFighting.y;
             // console.log("herox: ", this.hero.x) 
             // console.log(this.goblin.x - this.hero.attackRange);
 
-            if (this.hero.x >= this.goblin.x - this.hero.attackRange && this.hero.x <= this.goblin.x + this.hero.attackRange && this.hero.y >= this.goblin.y - this.hero.attackRange && this.hero.y <= this.goblin.y + this.hero.attackRange) {
+            if (this.hero.x >= this.enemyFighting.x - this.hero.attackRange && this.hero.x <= this.enemyFighting.x + this.hero.attackRange && this.hero.y >= this.enemyFighting.y - this.hero.attackRange && this.hero.y <= this.enemyFighting.y + this.hero.attackRange) {
                 this.hero.battleMode = true;
             }
             // checks if hero is within goblins range
-            if (this.goblin.x >= this.hero.x - this.goblin.attackRange && this.goblin.x <= this.hero.x + this.goblin.attackRange && this.goblin.y >= this.hero.y - this.goblin.attackRange && this.goblin.y <= this.hero.y + this.goblin.attackRange) {
-                this.goblin.battleMode = true;
+            if (this.enemyFighting.x >= this.hero.x - this.enemyFighting.attackRange && this.enemyFighting.x <= this.hero.x + this.enemyFighting.attackRange && this.enemyFighting.y >= this.hero.y - this.enemyFighting.attackRange && this.enemyFighting.y <= this.hero.y + this.enemyFighting.attackRange) {
+                this.enemyFighting.battleMode = true;
             }
         }
 
@@ -301,194 +347,202 @@ class Scene1 extends Phaser.Scene {
         this.changeDirTimer -= 1;
         // console.log(this.battleMode);
 
-
-        if (this.goblin.battleMode == false && this.goblin.status == "Alive") {
-            if (this.randNumb == 0 && this.goblin.x < this.goblin.walkAreaX[1]) {
-                this.goblin.x += this.goblin.speed;
-            }
-            else if (this.randNumb == 1 && this.goblin.x > this.goblin.walkAreaX[0]) {
-                this.goblin.x -= this.goblin.speed;
-            }
-            else if (this.randNumb == 2 && this.goblin.y < this.goblin.walkAreaY[1]) {
-                this.goblin.y += this.goblin.speed;
-            }
-            else if (this.randNumb == 3 && this.goblin.y > this.goblin.walkAreaY[0]) {
-                this.goblin.y -= this.goblin.speed;
+        for (var i = 0; i < this.enemies.length; i ++) {
+            if (this.enemies[i].battleMode == false && this.enemies[i].status == "Alive") {
+                if (this.randNumb == 0 && this.enemies[i].x < this.enemies[i].walkAreaX[1]) {
+                    this.enemies[i].x += this.enemies[i].speed;
+                }
+                else if (this.randNumb == 1 && this.enemies[i].x > this.enemies[i].walkAreaX[0]) {
+                    this.enemies[i].x -= this.enemies[i].speed;
+                }
+                else if (this.randNumb == 2 && this.enemies[i].y < this.enemies[i].walkAreaY[1]) {
+                    this.enemies[i].y += this.enemies[i].speed;
+                }
+                else if (this.randNumb == 3 && this.enemies[i].y > this.enemies[i].walkAreaY[0]) {
+                    this.enemies[i].y -= this.enemies[i].speed;
+                }
             }
         }
 
         // Enemy follows hero when hero runs away
-        if (this.goblin.battleMode == true && this.goblin.status == "Alive") {
-            if (this.goblin.x + 40 < this.hero.x) {
-                this.goblin.x += this.goblin.speed;
+        if (this.enemyFighting.battleMode == true && this.enemyFighting.status == "Alive") {
+            if (this.enemyFighting.x + 40 < this.hero.x) {
+                this.enemyFighting.x += this.enemyFighting.speed;
             }
-            else if (this.goblin.x - 40 > this.hero.x) {
-                this.goblin.x -= this.goblin.speed;
+            else if (this.enemyFighting.x - 40 > this.hero.x) {
+                this.enemyFighting.x -= this.enemyFighting.speed;
             }
-            if (this.goblin.y + 40 < this.hero.y) {
-                this.goblin.y += this.goblin.speed;
+            if (this.enemyFighting.y + 40 < this.hero.y) {
+                this.enemyFighting.y += this.enemyFighting.speed;
             }
-            else if (this.goblin.y - 40 > this.hero.y) {
-                this.goblin.y -= this.goblin.speed;
+            else if (this.enemyFighting.y - 40 > this.hero.y) {
+                this.enemyFighting.y -= this.enemyFighting.speed;
             }
             // disables goblin battle mode once hero runs away too far
             if (this.hero.battleMode == false) {
-                if (Math.abs(this.goblin.x - this.hero.x) > this.goblin.attackRange + 20) {
-                    this.goblin.battleMode = false;
+                if (Math.abs(this.enemyFighting.x - this.hero.x) > this.enemyFighting.attackRange + 20) {
+                    this.enemyFighting.battleMode = false;
+                    this.enemyFighting = "";
                 }
-                if (Math.abs(this.goblin.y - this.hero.y) > this.goblin.attackRange + 20) {
-                    this.goblin.battleMode = false;
+                else if (Math.abs(this.enemyFighting.y - this.hero.y) > this.enemyFighting.attackRange + 20) {
+                    this.enemyFighting.battleMode = false;
+                    this.enemyFighting = "";
                 }
-                if (this.goblin.x < this.goblin.walkAreaX[0] || this. goblin.x > this.goblin.walkAreaX[1]) {
-                    this.goblin.battleMode = false;
+                else if (this.enemyFighting.x < this.enemyFighting.walkAreaX[0] || this. enemyFighting.x > this.enemyFighting.walkAreaX[1]) {
+                    this.enemyFighting.battleMode = false;
+                    this.enemyFighting = "";
                 }
-                if (this.goblin.y < this.goblin.walkAreaY[0] || this. goblin.y > this.goblin.walkAreaY[1]) {
-                    this.goblin.battleMode = false;
+                else if (this.enemyFighting.y < this.enemyFighting.walkAreaY[0] || this.enemyFighting.y > this.enemyFighting.walkAreaY[1]) {
+                    this.enemyFighting.battleMode = false;
+                    this.enemyFighting = "";
                 }
             }
             
         }
 
         // Updates when hero and enemy leave battle mode
-        if (this.hero.battleMode == false && this.goblin.battleMode == false) {
-            // hides status bars
-            this.statusBarHero100.y = -40;
-            this.statusBarEnemy100.y= -40;
-            this.statusBarHero0.y = -40;
-            this.statusBarEnemy0.y = -40;
-            // Clears damage text
-            this.heroDamageText.y = -50;
-            this.enemyDamageText.y = -50;
-            this.enemyAttackPower = "";
-            this.attackPower = "";
-
-            this.attackTimer = 200;
-        }
-
-        if (this.hero.battleMode == true || this.goblin.battleMode == true) {
-            this.attackTimer -= 1;
-
-            // Changes status bar when taking damage
-            this.statusBarHero0.x = this.hero.x;
-            this.statusBarHero0.y = this.hero.y - 30;
-            this.statusBarHero100.x = this.hero.x - (((this.hero.maxhealth - this.hero.health ) * (23 / this.hero.maxhealth))/2); // Formula prevents the green bar from centering as it shrinks
-            this.statusBarHero100.y = this.hero.y - 30;
-            this.statusBarHero100.displayWidth =  (this.hero.health / this.hero.maxhealth) * 23;
-
-            this.statusBarEnemy0.x = this.goblin.x;
-            this.statusBarEnemy0.y = this.goblin.y - 30;
-            this.statusBarEnemy100.x = this.goblin.x - (((this.goblin.maxhealth - this.goblin.health ) * (23 / this.goblin.maxhealth))/2);
-            this.statusBarEnemy100.y = this.goblin.y - 30;
-            this.statusBarEnemy100.displayWidth =  (this.goblin.health / this.goblin.maxhealth) * 23;
-
-            if (this.attackTimer == this.hero.attackTime && this.hero.battleMode == true) {
-            
-                if (this.hero.frozen == false) {
-                    var count = 0;
-                    // Hero special attack
-                    var specialAttackNumb = Math.floor(Math.random() * (1/this.hero.specialAttackPerc));
-                    // console.log(specialAttackNumb);
-                    this.attackPower = Math.floor(Math.random() * (this.hero.powerLvAdj + 1));
-                    console.log(`${count}: Power ${this.attackPower} - Defense Benefit ${Math.max(this.hero.powerLvAdj - this.goblin.defenseBenefit, 1)} -  Defense Times ${this.goblin.defenseTimes}`)
-                    while (this.attackPower > Math.max(this.hero.powerLvAdj - this.goblin.defenseBenefit, 1) && count < this.goblin.defenseTimes){
-                        this.attackPower = Math.floor(Math.random() * (this.hero.powerLvAdj + 1));
-                        this.attackPower = Math.min(this.attackPower, this.goblin.health);
-                        console.log(`${count}: Power ${this.attackPower} - Defense Benefit ${Math.max(this.hero.powerLvAdj - this.goblin.defenseBenefit, 1)} -  Defense Times ${this.goblin.defenseTimes}`)
-                        count += 1;
-                        
-                    }
-                        
-                    if (specialAttackNumb == 0) {
-                        this.attackPower = this.attackPower = Math.min(this.attackPower * 2, this.goblin.health);
-                        this.historyLineTextList.unshift(`SPECIAL ATTACK: Hero does ${this.attackPower} damage to ${this.goblin.name}`);
-                    }
-                    else {
-                        this.historyLineTextList.unshift(`Hero does ${this.attackPower} damage to ${this.goblin.name}`);
-                        
-                    }
-
-                    // console.log("Hero attacks goblin :", this.attackPower);
-                    this.goblin.health -= this.attackPower;
-                    // Sets attack number color
-                    if (this.attackPower == 0) {
-                        this.damageColor = "blue"
-                    }
-                    else {
-                        this.damageColor = "red"
-                    }
-                    // this.historyLineTextList.unshift(`Hero does ${this.attackPower} damage to ${this.goblin.name}`);
-                    this.historyLineTextColor.unshift(this.neon);
-
-                    // Experience points
-                    if (this.hero.attackStance == "Aggressive") {
-                        this.hero.powerExp += Math.round(this.attackPower * 3.7);
-                        this.hero.healthExp += Math.round(this.attackPower * 1.5);
-                        this.hero.powerStanceBonus = 3;
-                    }
-                    else if (this.hero.attackStance == "Defensive") {
-                        this.hero.defenseExp += Math.round(this.attackPower * 3.7);
-                        this.hero.healthExp += Math.round(this.attackPower * 1.5);
-                    }
-                    else if (this.hero.attackStance == "Normal") {
-                        this.hero.powerExp += Math.round(this.attackPower * 1.5);
-                        this.hero.defenseExp += Math.round(this.attackPower * 1.5);
-                        this.hero.healthExp += Math.round(this.attackPower * 2.0);
-                    }
-                }
-                if (this.hero.frozen == true) {
-                    this.hero.frozen = false;
-                }
+        for (var i = 0; i < this.enemies.length; i ++) { 
+            if (this.hero.battleMode == false && this.enemies[i].battleMode == false) {
+                // hides status bars
+                this.statusBarHero100.y = -40;
+                this.statusBarEnemy100.y= -40;
+                this.statusBarHero0.y = -40;
+                this.statusBarEnemy0.y = -40;
+                // Clears damage text
+                this.heroDamageText.y = -50;
+                this.enemyDamageText.y = -50;
+                this.enemyAttackPower = "";
+                this.attackPower = "";
+    
+                this.attackTimer = 200;
             }
-            if (this.attackTimer == this.goblin.attackTime && this.goblin.battleMode == true) {
-                var count = 0;
-                // console.log(`${count}: Power ${this.enemyAttackPower} - Defense Benefit ${Math.max(this.goblin.power - this.hero.defenseBenefit, 1)} -  Defense Times ${this.hero.defenseTimes}`)
-                this.enemyAttackPower = Math.floor(Math.random() * (this.goblin.power + 1));
-                while (this.enemyAttackPower > Math.max(this.goblin.power - this.hero.defenseBenefit, 1) && count < this.hero.defenseTimes){
-                    this.enemyAttackPower = Math.floor(Math.random() * (this.goblin.power + 1));
-                    this.enemyAttackPower = Math.min(this.enemyAttackPower, this.hero.health);
-                    // console.log(`${count}: Power ${this.enemyAttackPower} - Defense Benefit ${Math.max(this.goblin.power - this.hero.defenseBenefit, 1)} -  Defense Times ${this.hero.defenseTimes}`)
-                    count += 1;
-                }
+        }
+        
+            if (this.hero.battleMode == true || this.enemyFighting.battleMode == true) {
+                this.attackTimer -= 1;
+
+                // Changes status bar when taking damage
+                this.statusBarHero0.x = this.hero.x;
+                this.statusBarHero0.y = this.hero.y - 30;
+                this.statusBarHero100.x = this.hero.x - (((this.hero.maxhealth - this.hero.health ) * (23 / this.hero.maxhealth))/2); // Formula prevents the green bar from centering as it shrinks
+                this.statusBarHero100.y = this.hero.y - 30;
+                this.statusBarHero100.displayWidth =  (this.hero.health / this.hero.maxhealth) * 23;
+
+                this.statusBarEnemy0.x = this.enemyFighting.x;
+                this.statusBarEnemy0.y = this.enemyFighting.y - 30;
+                this.statusBarEnemy100.x = this.enemyFighting.x - (((this.enemyFighting.maxhealth - this.enemyFighting.health ) * (23 / this.enemyFighting.maxhealth))/2);
+                this.statusBarEnemy100.y = this.enemyFighting.y - 30;
+                this.statusBarEnemy100.displayWidth =  (this.enemyFighting.health / this.enemyFighting.maxhealth) * 23;
+
+                if (this.attackTimer == this.hero.attackTime && this.hero.battleMode == true) {
                 
-                this.enemyAttackPower = Math.min(this.enemyAttackPower, this.hero.health);
-                this.hero.health -= this.enemyAttackPower;
-                // Sets attack number color
-                if (this.enemyAttackPower == 0) {
-                    this.enemyDamageColor = "blue"
+                    if (this.hero.frozen == false) {
+                        var count = 0;
+                        // Hero special attack
+                        var specialAttackNumb = Math.floor(Math.random() * (1/this.hero.specialAttackPerc));
+                        // console.log(specialAttackNumb);
+                        this.attackPower = Math.floor(Math.random() * (this.hero.powerLvAdj + 1));
+                        console.log(`${count}: Power ${this.attackPower} - Defense Benefit ${Math.max(this.hero.powerLvAdj - this.enemyFighting.defenseBenefit, 1)} -  Defense Times ${this.enemyFighting.defenseTimes}`)
+                        while (this.attackPower > Math.max(this.hero.powerLvAdj - this.enemyFighting.defenseBenefit, 1) && count < this.enemyFighting.defenseTimes){
+                            this.attackPower = Math.floor(Math.random() * (this.hero.powerLvAdj + 1));
+                            this.attackPower = Math.min(this.attackPower, this.enemyFighting.health);
+                            console.log(`${count}: Power ${this.attackPower} - Defense Benefit ${Math.max(this.hero.powerLvAdj - this.enemyFighting.defenseBenefit, 1)} -  Defense Times ${this.enemyFighting.defenseTimes}`)
+                            count += 1;
+                            
+                        }
+                            
+                        if (specialAttackNumb == 0) {
+                            this.attackPower = this.attackPower = Math.min(this.attackPower * 2, this.enemyFighting.health);
+                            this.historyLineTextList.unshift(`SPECIAL ATTACK: Hero does ${this.attackPower} damage to ${this.enemyFighting.name}`);
+                        }
+                        else {
+                            this.historyLineTextList.unshift(`Hero does ${this.attackPower} damage to ${this.enemyFighting.name}`);
+                            
+                        }
+
+                        // console.log("Hero attacks goblin :", this.attackPower);
+                        this.enemyFighting.health -= this.attackPower;
+                        // Sets attack number color
+                        if (this.attackPower == 0) {
+                            this.damageColor = "blue"
+                        }
+                        else {
+                            this.damageColor = "red"
+                        }
+                        this.historyLineTextColor.unshift(this.neon);
+
+                        // Experience points
+                        if (this.hero.attackStance == "Aggressive") {
+                            this.hero.powerExp += Math.round(this.attackPower * 3.7);
+                            this.hero.healthExp += Math.round(this.attackPower * 1.5);
+                            this.hero.powerStanceBonus = 3;
+                        }
+                        else if (this.hero.attackStance == "Defensive") {
+                            this.hero.defenseExp += Math.round(this.attackPower * 3.7);
+                            this.hero.healthExp += Math.round(this.attackPower * 1.5);
+                        }
+                        else if (this.hero.attackStance == "Normal") {
+                            this.hero.powerExp += Math.round(this.attackPower * 1.5);
+                            this.hero.defenseExp += Math.round(this.attackPower * 1.5);
+                            this.hero.healthExp += Math.round(this.attackPower * 2.0);
+                        }
+                    }
+                    if (this.hero.frozen == true) {
+                        this.hero.frozen = false;
+                    }
                 }
-                else {
-                    this.enemyDamageColor = "red"
+                if (this.attackTimer == this.enemyFighting.attackTime && this.enemyFighting.battleMode == true) {
+                    var count = 0;
+                    // console.log(`${count}: Power ${this.enemyAttackPower} - Defense Benefit ${Math.max(this.goblin.power - this.hero.defenseBenefit, 1)} -  Defense Times ${this.hero.defenseTimes}`)
+                    this.enemyAttackPower = Math.floor(Math.random() * (this.enemyFighting.power + 1));
+                    while (this.enemyAttackPower > Math.max(this.enemyFighting.power - this.hero.defenseBenefit, 1) && count < this.hero.defenseTimes){
+                        this.enemyAttackPower = Math.floor(Math.random() * (this.enemyFighting.power + 1));
+                        this.enemyAttackPower = Math.min(this.enemyAttackPower, this.hero.health);
+                        // console.log(`${count}: Power ${this.enemyAttackPower} - Defense Benefit ${Math.max(this.goblin.power - this.hero.defenseBenefit, 1)} -  Defense Times ${this.hero.defenseTimes}`)
+                        count += 1;
+                    }
+                    
+                    this.enemyAttackPower = Math.min(this.enemyAttackPower, this.hero.health);
+                    this.hero.health -= this.enemyAttackPower;
+                    // Sets attack number color
+                    if (this.enemyAttackPower == 0) {
+                        this.enemyDamageColor = "blue"
+                    }
+                    else {
+                        this.enemyDamageColor = "red"
+                    }
+                    this.historyLineTextList.unshift(`${this.enemyFighting.name} does ${this.enemyAttackPower} damage to Hero`);
+                    this.historyLineTextColor.unshift("Red");
                 }
-                this.historyLineTextList.unshift(`${this.goblin.name} does ${this.enemyAttackPower} damage to Hero`);
-                this.historyLineTextColor.unshift("Red");
+
+                // Shows damage above characters head
+                this.heroDamageText.x = this.hero.x - 5;
+                this.heroDamageText.y = this.hero.y - 55;
+                this.heroDamageText.setText(this.enemyAttackPower).setStyle({font:"18px Ariel Bold", color: this.enemyDamageColor});
+
+                this.enemyDamageText.x = this.enemyFighting.x - 5;
+                this.enemyDamageText.y = this.enemyFighting.y - 55;
+                this.enemyDamageText.setText(this.attackPower).setStyle({font:"18px Ariel Bold", color: this.damageColor});;
+
+                if (this.attackTimer <= 0) {
+                    this.attackTimer =  200;
+                }
             }
-
-            // Shows damage above characters head
-            this.heroDamageText.x = this.hero.x - 5;
-            this.heroDamageText.y = this.hero.y - 55;
-            this.heroDamageText.setText(this.enemyAttackPower).setStyle({font:"18px Ariel Bold", color: this.enemyDamageColor});
-
-            this.enemyDamageText.x = this.goblin.x - 5;
-            this.enemyDamageText.y = this.goblin.y - 55;
-            this.enemyDamageText.setText(this.attackPower).setStyle({font:"18px Ariel Bold", color: this.damageColor});;
-
-            if (this.attackTimer <= 0) {
-                this.attackTimer =  200;
-            }
-        }
 
         // Character death
-        if (this.goblin.health <= 0 || this.hero.health <= 0) {
-            if (this.goblin.health <= 0) {
-                if (this.goblin.status == "Alive") { // Prevents loop that would happen until enemy respawn
-                    var enemyBounty = this.goblin.bounty[Math.floor(Math.random() * 5)];
+        if ((this.enemyFighting.health <= 0 || this.hero.health <= 0) && this.enemyFighting.battleMode == true) {
+            if (this.enemyFighting.health <= 0) {
+                if (this.enemyFighting.status == "Alive") { // Prevents loop that would happen until enemy respawn
+                    var enemyBounty = this.enemyFighting.bounty[Math.floor(Math.random() * 5)];
                     this.hero.coins += enemyBounty;
-                    this.historyLineTextList.unshift(`${this.goblin.name} dead. You received ${enemyBounty} coins`);
+                    this.historyLineTextList.unshift(`${this.enemyFighting.name} dead. You received ${enemyBounty} coins`);
                     this.historyLineTextColor.unshift("Yellow");
                     this.mouseClicked = false;
+                    this.deadEnemyList.push(this.enemyFighting);
                 }
-                this.goblin.status = "Dead";
-                this.goblin.y = -50;
+                this.enemyFighting.status = "Dead";
+                this.enemyFighting.y = -50;
+
                 // Bounty drop
             }
             else if (this.hero.health <= 0) {
@@ -499,22 +553,38 @@ class Scene1 extends Phaser.Scene {
                 this.mouseClickY = 300;
             }
             this.hero.battleMode = false;
-            this.goblin.battleMode = false;
+            this.enemyFighting.battleMode = false;
             this.attackEnemy = false;
         }
 
         // Enemy respawn
-        if (this.goblin.status == "Dead") {
-            this.goblin.respawnTimer -= 1;
-            if (this.goblin.respawnTimer <= 0) {
-                this.goblin.status = "Alive";
-                this.goblin.x = Math.floor(Math.random()*((this.goblin.walkAreaX[1] - 10)-(this.goblin.walkAreaX[0] + 10)+1)+(this.goblin.walkAreaX[0] + 10));
-                this.goblin.y = Math.floor(Math.random()*((this.goblin.walkAreaY[1] - 10)-(this.goblin.walkAreaY[0] + 10)+1)+(this.goblin.walkAreaY[0] + 10));;
-                this.goblin.respawnTimer = this.goblin.respawnTime;
-                this.goblin.health = this.goblin.maxhealth;
-                
+        try {
+            if (this.deadEnemyList.length > 0) {
+                for (var i = 0; i < this.deadEnemyList.length; i++) {
+                    this.deadEnemyList[i].respawnTimer -= 1;
+                    if (this.deadEnemyList[i].respawnTimer <= 0) {
+                        this.deadEnemyList[i].status = "Alive";
+                        this.deadEnemyList[i].x = Math.floor(Math.random()*((this.deadEnemyList[i].walkAreaX[1] - 10)-(this.deadEnemyList[i].walkAreaX[0] + 10)+1)+(this.deadEnemyList[i].walkAreaX[0] + 10));
+                        this.deadEnemyList[i].y = Math.floor(Math.random()*((this.deadEnemyList[i].walkAreaY[1] - 10)-(this.deadEnemyList[i].walkAreaY[0] + 10)+1)+(this.deadEnemyList[i].walkAreaY[0] + 10));;
+                        this.deadEnemyList[i].respawnTimer = this.deadEnemyList[i].respawnTime;
+                        this.deadEnemyList[i].health = this.deadEnemyList[i].maxhealth;
+                        var index = this.deadEnemyList.indexOf(this.deadEnemyList[i]);
+                        this.deadEnemyList.splice(index, 1);
+                        
+                    }
+                }
+                // if (this.enemyFighting.status == "Dead") {
+                //     this.enemyFighting.respawnTimer -= 1;
+                    
+                // }
             }
         }
+        catch(err) {
+            console.log(err);
+        }
+
+        
+        
         
         // Leveling up
         if (this.hero.powerExp >= this.hero.nextPowerLevelExp) {
@@ -536,14 +606,15 @@ class Scene1 extends Phaser.Scene {
 
 
         // Mouse over enemy
-        
-        this.goblin.on('pointerover', function(pointer) {
-            // this.text.setText(this.attack);
-            this.text.setText(`Attack ${this.name}. (Power: ${this.power} Defense: ${this.defense} Health: ${this.health})`);
-        })
-        this.goblin.on('pointerout', function(pointer) {
-            this.text.setText('');
-        })
+        for (var i = 0; i < this.enemies.length; i ++) {
+            this.enemies[i].on('pointerover', function(pointer) {
+                // this.text.setText(this.attack);
+                this.text.setText(`Attack ${this.name}. (Power: ${this.power} Defense: ${this.defense} Health: ${this.health})`);
+            })
+            this.enemies[i].on('pointerout', function(pointer) {
+                this.text.setText('');
+            })
+        }
         this.healingPotionPic.on('pointerover', function(pointer) {
             this.text.setText(`Click to drink healing potion`);
         })
