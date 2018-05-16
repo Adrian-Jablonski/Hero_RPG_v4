@@ -83,8 +83,10 @@ class Scene1 extends Phaser.Scene {
         this.goblin = new Goblin({
             key: 'goblin',
             scene: this,
-            x: 300,
-            y: 300,
+            walkAreaX : [100, 300],
+            walkAreaY : [100, 300],
+            x: 150,
+            y: 150,
         }).setInteractive(); // set interactive allows pointerover event
 
         //create hero and enemy health bar off screen
@@ -109,6 +111,9 @@ class Scene1 extends Phaser.Scene {
         this.heroDefenseExpText = this.add.text(545, 190, `Current Exp: ${this.hero.defenseExp}        Next Level: ${this.hero.nextDefenseLevelExp}`, {font:"14px Ariel", color:"Blue"});
 
         this.heroHealthExpText = this.add.text(545, 245, `Current Exp: ${this.hero.healthExp}        Next Level: ${this.hero.nextHealthLevelExp}`, {font:"14px Ariel", color:"Red"});
+
+        // Inventory
+        this.healingPotionText = this.add.text(705, 317, `${this.hero.healingPotion}`, {font:"20px Ariel", color:"Red"})
 
         // Damage text
         this.heroDamageText = this.add.text(-20, 20, "", {font:"18px 'Ariel Bold'", color:"Red"});
@@ -147,6 +152,7 @@ class Scene1 extends Phaser.Scene {
         // Handles click events
         this.input.on('pointerdown', function(event) {
             // Moves player to click location
+            console.log(this.attackTimer);
             this.mouseClickX = event.x;
             this.mouseClickY = event.y;
             this.mouseClicked = true;
@@ -157,23 +163,16 @@ class Scene1 extends Phaser.Scene {
             if (enemyClicked(this.mouseClickX, this.mouseClickY, this.goblin, this.gameScreen) == true) {
                 this.attackEnemy = true;
             }
-            else {
+            else if (enemyClicked(this.mouseClickX, this.mouseClickY, this.goblin, this.gameScreen) == false){
                 this.attackEnemy = false;
                 this.hero.battleMode = false;
             }
-            // if (this.mouseClickX >= this.goblin.x - 15 && this.mouseClickX <= this.goblin.x + 15 && this.mouseClickY >= this.goblin.y - 15 && this.mouseClickY <= this.goblin.y + 15 ) {
-            //     this.attackEnemy = true;
-            // }
-            // else if (this.mouseClickX < this.gameScreen && this.mouseClickX > 0 && this.mouseClickY < this.gameScreen && this.mouseClickY > 0){ // Prevents battle mode being changed by clicks outside game screen
-            //     // this.battleMode = false;
-            //     this.attackEnemy = false;
-            //     this.hero.battleMode = false;
-            // }
 
             console.log("x: ", event.x, " y: ", event.y);
             //console.log("player position :", this.hero.x, this.hero.y);
             // console.log("enemy position :", this.goblin.clickPosition);
 
+            // Controls history text buttons
             if (this.mouseClickX >= 446 && this.mouseClickX <=485 && this.mouseClickY >= 558 && this.mouseClickY <= 590) {
                 if (this.historyLineTextList.length > 6 && this.historyTextScroll < this.historyLineTextList.length - 5) {
                     this.historyTextScroll += 1
@@ -202,24 +201,15 @@ class Scene1 extends Phaser.Scene {
                 this.radioButton.y = 572;
                 this.hero.attackStance = "Normal";
             }
-
-            // if (this.mouseClickX >= 540 && this.mouseClickX <=565 && this.mouseClickY >= 522 && this.mouseClickY <= 545) {
-            //     this.radioButton.x = 552;
-            //     this.radioButton.y = 530;
-            //     this.hero.attackStance = "Aggressive";
-            // }
-            // else if (this.mouseClickX >= 682 && this.mouseClickX <= 707 && this.mouseClickY >= 522 && this.mouseClickY <= 545) {
-            //     this.radioButton.x = 692;
-            //     this.radioButton.y = 530;
-            //     this.hero.attackStance = "Defensive";
-            // }
-            // else if (this.mouseClickX >= 540 && this.mouseClickX <=565 && this.mouseClickY >= 564 && this.mouseClickY <= 591) {
-            //     this.radioButton.x = 552;
-            //     this.radioButton.y = 572;
-            //     this.hero.attackStance = "Normal";
-            // }
             console.log(this.hero.attackStance);
 
+            // healing potion
+            if (this.mouseClickX >= 538 && this.mouseClickX <= 558 && this.mouseClickY >= 315 && this.mouseClickY <= 342) {
+                if (this.hero.healingPotion > 0) {
+                    this.hero.health = Math.min(this.hero.maxhealth, (this.hero.health + 10));
+                    this.hero.healingPotion -= 1;
+                }
+            }
 
         },this);
 
@@ -238,10 +228,6 @@ class Scene1 extends Phaser.Scene {
     update(delta) {
         // this.timer += 1
         // console.log(this.timer)
-        // Moves player left while holding left key
-        if(this.key_LEFT.isDown) {
-            this.hero.x--;
-        }
 
         // Checks if enemy is within range of attacking
         if (this.attackEnemy == true || (this.goblin.battleMode == true && this.attackEnemy == true)) {
@@ -254,10 +240,10 @@ class Scene1 extends Phaser.Scene {
             if (this.hero.x >= this.goblin.x - this.hero.attackRange && this.hero.x <= this.goblin.x + this.hero.attackRange && this.hero.y >= this.goblin.y - this.hero.attackRange && this.hero.y <= this.goblin.y + this.hero.attackRange) {
                 this.hero.battleMode = true;
             }
+            // checks if hero is within goblins range
             if (this.goblin.x >= this.hero.x - this.goblin.attackRange && this.goblin.x <= this.hero.x + this.goblin.attackRange && this.goblin.y >= this.hero.y - this.goblin.attackRange && this.goblin.y <= this.hero.y + this.goblin.attackRange) {
                 this.goblin.battleMode = true;
             }
-
         }
 
         // Moves player to mouse click
@@ -297,18 +283,19 @@ class Scene1 extends Phaser.Scene {
         this.changeDirTimer -= 1;
         // console.log(this.battleMode);
 
+
         if (this.goblin.battleMode == false && this.goblin.status == "Alive") {
-            if (this.randNumb == 0 && this.goblin.x < this.sceneX[1]) {
-                this.goblin.x += .5;
+            if (this.randNumb == 0 && this.goblin.x < this.goblin.walkAreaX[1]) {
+                this.goblin.x += this.goblin.speed;
             }
-            else if (this.randNumb == 1 && this.goblin.x > this.sceneX[0]) {
-                this.goblin.x -= .5;
+            else if (this.randNumb == 1 && this.goblin.x > this.goblin.walkAreaX[0]) {
+                this.goblin.x -= this.goblin.speed;
             }
-            else if (this.randNumb == 2 && this.goblin.y < this.sceneY[1]) {
-                this.goblin.y += .5;
+            else if (this.randNumb == 2 && this.goblin.y < this.goblin.walkAreaY[1]) {
+                this.goblin.y += this.goblin.speed;
             }
-            else if (this.randNumb == 3 && this.goblin.y > this.sceneY[0]) {
-                this.goblin.y -= .5;
+            else if (this.randNumb == 3 && this.goblin.y > this.goblin.walkAreaY[0]) {
+                this.goblin.y -= this.goblin.speed;
             }
         }
 
@@ -334,18 +321,30 @@ class Scene1 extends Phaser.Scene {
                 if (Math.abs(this.goblin.y - this.hero.y) > this.goblin.attackRange + 20) {
                     this.goblin.battleMode = false;
                 }
+                if (this.goblin.x < this.goblin.walkAreaX[0] || this. goblin.x > this.goblin.walkAreaX[1]) {
+                    this.goblin.battleMode = false;
+                }
+                if (this.goblin.y < this.goblin.walkAreaY[0] || this. goblin.y > this.goblin.walkAreaY[1]) {
+                    this.goblin.battleMode = false;
+                }
             }
             
         }
 
+        // Updates when hero and enemy leave battle mode
         if (this.hero.battleMode == false && this.goblin.battleMode == false) {
             // hides status bars
             this.statusBarHero100.y = -40;
             this.statusBarEnemy100.y= -40;
             this.statusBarHero0.y = -40;
             this.statusBarEnemy0.y = -40;
+            // Clears damage text
             this.heroDamageText.y = -50;
             this.enemyDamageText.y = -50;
+            this.enemyAttackPower = "";
+            this.attackPower = "";
+
+            this.attackTimer = 200;
         }
 
         if (this.hero.battleMode == true || this.goblin.battleMode == true) {
@@ -364,7 +363,7 @@ class Scene1 extends Phaser.Scene {
             this.statusBarEnemy100.y = this.goblin.y - 30;
             this.statusBarEnemy100.displayWidth =  (this.goblin.health / this.goblin.maxhealth) * 23;
 
-            if (this.attackTimer == 190 && this.hero.battleMode == true) {
+            if (this.attackTimer == this.hero.attackTime && this.hero.battleMode == true) {
                 this.attackPower = Math.floor(Math.random() * (this.hero.power + 1));
                 this.attackPower = Math.min(this.attackPower, this.goblin.health);
                 // console.log("Hero attacks goblin :", this.attackPower);
@@ -394,7 +393,7 @@ class Scene1 extends Phaser.Scene {
                     this.hero.healthExp += Math.round(this.attackPower * 2.0);
                 }
             }
-            if (this.attackTimer == 90 && this.goblin.battleMode == true) {
+            if (this.attackTimer == this.goblin.attackTime && this.goblin.battleMode == true) {
                 this.enemyAttackPower = Math.floor(Math.random() * (this.goblin.power + 1));
                 this.enemyAttackPower = Math.min(this.enemyAttackPower, this.hero.health);
                 this.hero.health -= this.enemyAttackPower;
@@ -444,6 +443,7 @@ class Scene1 extends Phaser.Scene {
             }
             this.hero.battleMode = false;
             this.goblin.battleMode = false;
+            this.attackEnemy = false;
         }
 
         // Enemy respawn
@@ -451,9 +451,9 @@ class Scene1 extends Phaser.Scene {
             this.goblin.respawnTimer -= 1;
             if (this.goblin.respawnTimer <= 0) {
                 this.goblin.status = "Alive";
-                this.goblin.x = 100;
-                this.goblin.y = 300;
-                this.goblin.respawnTimer = 200;
+                this.goblin.x = Math.floor(Math.random()*((this.goblin.walkAreaX[1] - 10)-(this.goblin.walkAreaX[0] + 10)+1)+(this.goblin.walkAreaX[0] + 10));
+                this.goblin.y = Math.floor(Math.random()*((this.goblin.walkAreaY[1] - 10)-(this.goblin.walkAreaY[0] + 10)+1)+(this.goblin.walkAreaY[0] + 10));;
+                this.goblin.respawnTimer = this.goblin.respawnTime;
                 this.goblin.health = this.goblin.maxhealth;
                 
             }
@@ -507,6 +507,8 @@ class Scene1 extends Phaser.Scene {
         this.historyLogCount.setText(`${this.historyLineTextList.length - this.historyTextScroll} / ${this.historyLineTextList.length}`);
 
         this.coinText.setText(`${this.hero.coins}`);
+
+        this.healingPotionText.setText(`${this.hero.healingPotion}`)
         
     }
 }

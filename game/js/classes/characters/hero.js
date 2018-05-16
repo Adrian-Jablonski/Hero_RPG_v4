@@ -19,6 +19,8 @@ class Hero extends Phaser.GameObjects.Sprite {
         this.coins = 100;
         this.attackRange = 70;
         this.battleMode = false;
+        this.attackTime = 190;
+        this.healingPotion = 2;
 
     }    
 }
