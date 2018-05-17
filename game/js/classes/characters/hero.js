@@ -1,4 +1,4 @@
-class Hero extends Phaser.GameObjects.Sprite {
+export default class Hero extends Phaser.GameObjects.Sprite {
     constructor(config) {
         super(config.scene, config.x, config.y, config.key);
         this.scene = config.scene;
@@ -30,5 +30,3 @@ class Hero extends Phaser.GameObjects.Sprite {
 
     }    
 }
-
-export default Hero;

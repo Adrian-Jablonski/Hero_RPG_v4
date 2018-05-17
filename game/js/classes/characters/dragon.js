@@ -1,19 +1,19 @@
-export default class Goblin extends Phaser.GameObjects.Sprite {
+export default class Dragon extends Phaser.GameObjects.Sprite {
     constructor(config) {
         super(config.scene, config.x, config.y, config.key, config.walkAreaX, config.walkAreaY);
         this.scene = config.scene;
         this.scene.add.existing(this);
 
-        this.name = "Goblin";
-        this.power = 7;
-        this.defense = 5;
-        this.health = 8;
-        this.maxhealth = 8;
+        this.name = "Dragon";
+        this.power = 50;
+        this.defense = 50;
+        this.health = 50;
+        this.maxhealth = 50;
         this.status = "Alive";
-        this.respawnTime = 200;
-        this.respawnTimer = 200;
-        this.bounty = [5, 5, 6, 6, 8, 10];
-        this.attackRange = 70;
+        this.respawnTime = 800;
+        this.respawnTimer = 800;
+        this.bounty = [400, 500, 700, 800];
+        this.attackRange = 220;
         this.battleMode = false;
         this.speed = .5;
         this.x_y_whenClicked = ["", ""];

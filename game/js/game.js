@@ -1,11 +1,12 @@
-import Scene1 from './scenes/Scene1.js';
-import Scene2 from './scenes/Scene2.js';
+import Area100_100 from './scenes/Area100_100.js';
+import Area99_100 from './scenes/Area99_100.js';
 
 var config = {
     type: Phaser.AUTO,
     width: 850,
     height: 750,
-    scene: [ Scene1, Scene2 ]
+    scene: [ Area100_100, Area99_100 ],
+
 };
 
 var game = new Phaser.Game(config);

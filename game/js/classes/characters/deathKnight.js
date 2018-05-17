@@ -1,4 +1,4 @@
-class DeathKnight extends Phaser.GameObjects.Sprite {
+export default class DeathKnight extends Phaser.GameObjects.Sprite {
     constructor(config) {
         super(config.scene, config.x, config.y, config.key, config.walkAreaX, config.walkAreaY);
         this.scene = config.scene;
@@ -25,5 +25,3 @@ class DeathKnight extends Phaser.GameObjects.Sprite {
         this.defenseTimes = Math.round(this.defense / 4);
     }    
 }
-
-export default DeathKnight;
