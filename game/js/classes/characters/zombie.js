@@ -10,6 +10,8 @@ export default class Zombie extends Phaser.GameObjects.Sprite {
         this.health = 30;
         this.maxhealth = 30;
         this.status = "Alive";
+        this.width = 38;
+        this.height = 70;
         this.respawnTime = 200;
         this.respawnTimer = 200;
         this.bounty = [100, 100, 150, 150, 200, 250];

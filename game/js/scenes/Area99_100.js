@@ -1,3 +1,5 @@
+var area = "area99_100"
+
 import BaseScene from '/js/utilities/basescene.js';
 import sceneImports from '../utilities/imports.js';  // Imports all images
 
@@ -23,35 +25,7 @@ export default class Area99_100 extends BaseScene {
     }
     
     preload() {
-        // Loads background images
-        this.load.image('dark-background', sceneImports.backgroundImage);
-        this.load.image('area99_100',area99_100);
-        this.load.image('user-interface', sceneImports.userInterface)
-
-        // Characters
-        this.load.image('hero', sceneImports.heroImage, 41, 55);
-        this.load.image('goblin', sceneImports.goblin, 32, 32);
-        this.load.image('deathKnight', sceneImports.deathKnight);
-        this.load.image('shadow', sceneImports.shadow);
-        this.load.image('wizard', sceneImports.wizard);
-        this.load.image('ranger', sceneImports.ranger);
-        this.load.image('zombie', sceneImports.zombie);
-        this.load.image('dragon', sceneImports.dragon);
-
-        // Status Bars
-        this.load.image('statusBar100', sceneImports.statusBar100);
-        this.load.image('statusBar0', sceneImports.statusBar0)
-
-        this.load.image('scrollUp', sceneImports.scrollUp);
-        this.load.image('scrollDown', sceneImports.scrollDown);
-
-        this.load.image('radioButton', sceneImports.radioButton);
-
-        this.load.image('healingPotionPic', sceneImports.healingPotionPic);
-
-        // Colors 
-        this.neon = "#39FF14"
-
+        super.preload('area99_100', area99_100)
     }
     
     create() {

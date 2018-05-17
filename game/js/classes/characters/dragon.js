@@ -10,6 +10,8 @@ export default class Dragon extends Phaser.GameObjects.Sprite {
         this.health = 50;
         this.maxhealth = 50;
         this.status = "Alive";
+        this.width = 140;
+        this.height = 83;
         this.respawnTime = 800;
         this.respawnTimer = 800;
         this.bounty = [400, 500, 700, 800];

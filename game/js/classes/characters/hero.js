@@ -16,7 +16,7 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.nextPowerLevelExp = Math.round(((25 + (this.power + 1)) * (this.power + 1) / 1.13767) * this.power);
         this.nextDefenseLevelExp = Math.round(((25 + (this.defense + 1)) * (this.defense + 1) / 1.13767) * this.defense);
         this.coins = 100;
-        this.attackRange = 70;
+        this.attackRange = 50;
         this.battleMode = false;
         this.attackTime = 190;
         this.healingPotion = 2;

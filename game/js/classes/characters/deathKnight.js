@@ -9,6 +9,8 @@ export default class DeathKnight extends Phaser.GameObjects.Sprite {
         this.defense = 10;
         this.health = 20;
         this.maxhealth = 20;
+        this.width = 36;
+        this.height = 49;
         this.status = "Alive";
         this.respawnTime = 400;
         this.respawnTimer = 400;

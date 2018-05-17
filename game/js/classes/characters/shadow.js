@@ -10,6 +10,8 @@ export default class Shadow extends Phaser.GameObjects.Sprite {
         this.health = 1;
         this.maxhealth = 1;
         this.status = "Alive";
+        this.width = 75;
+        this.height = 70;
         this.respawnTime = 200;
         this.respawnTimer = 200;
         this.bounty = [35, 35, 40, 40, 45, 45, 50, 60, 70];

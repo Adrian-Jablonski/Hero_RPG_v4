@@ -1,6 +1,6 @@
 // Checks if enemy was clicked
-function enemyClicked(mouseClickX, mouseClickY, goblin, gameScreen) {
-    if (mouseClickX >= goblin.x - 15 && mouseClickX <= goblin.x + 15 && mouseClickY >= goblin.y - 15 && mouseClickY <= goblin.y + 15 ) {
+function enemyClicked(mouseClickX, mouseClickY, enemy, gameScreen) {
+    if (mouseClickX >= enemy.x - (enemy.width / 2) && mouseClickX <= enemy.x + (enemy.width / 2) && mouseClickY >= enemy.y - (enemy.height / 2) && mouseClickY <= enemy.y + (enemy.height / 2) ) {
         return true;
     }
     else if (mouseClickX < gameScreen && mouseClickX > 0 && mouseClickY < gameScreen && mouseClickY > 0){ // Prevents battle mode being changed by clicks outside game screen

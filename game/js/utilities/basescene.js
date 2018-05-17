@@ -1,17 +1,18 @@
 import {Scene} from 'phaser';
-import backgroundImage from '/assets/sprites/background-images/dark_background.png';
-import area100_100 from '/assets/sprites/background-images/area_100_100.png';
+import sceneImports from '../utilities/imports.js'; // Imports all images
+// import backgroundImage from '/assets/sprites/background-images/dark_background.png';
+// import area100_100 from '/assets/sprites/background-images/area_100_100.png';
 
-import userInterface from '/assets/sprites/background-images/user_interface.png';
- // Characters
-import heroImage from '/assets/sprites/characters/hero.png';
-import goblin from '/assets/sprites/characters/goblin.png';
-import deathKnight from '/assets/sprites/characters/deathKnight.png';
-import shadow from '/assets/sprites/characters/shadow.png';
-import wizard from '/assets/sprites/characters/wizard.png';
-import ranger from '/assets/sprites/characters/ranger.png';
-import zombie from '/assets/sprites/characters/zombie.png';
-import dragon from '/assets/sprites/characters/dragon.png';
+// import userInterface from '/assets/sprites/background-images/user_interface.png';
+//  // Characters
+// import heroImage from '/assets/sprites/characters/hero.png';
+// import goblin from '/assets/sprites/characters/goblin.png';
+// import deathKnight from '/assets/sprites/characters/deathKnight.png';
+// import shadow from '/assets/sprites/characters/shadow.png';
+// import wizard from '/assets/sprites/characters/wizard.png';
+// import ranger from '/assets/sprites/characters/ranger.png';
+// import zombie from '/assets/sprites/characters/zombie.png';
+// import dragon from '/assets/sprites/characters/dragon.png';
 
 // Load character objects
 import Hero from '../classes/characters/hero.js'; 
@@ -24,15 +25,15 @@ import Zombie from '../classes/characters/zombie.js';
 import Dragon from '../classes/characters/dragon.js';
 
  // Status Bars
-import statusBar100 from '/assets/sprites/Status_Bars/Status_Bar100.png';
-import statusBar0 from '/assets/sprites/Status_Bars/Status_Bar0.png';
+// import statusBar100 from '/assets/sprites/Status_Bars/Status_Bar100.png';
+// import statusBar0 from '/assets/sprites/Status_Bars/Status_Bar0.png';
 
-import scrollUp from '/assets/sprites/icons/scroll_up_button.gif';
-import scrollDown from '/assets/sprites/icons/scroll_down_button.gif';
+// import scrollUp from '/assets/sprites/icons/scroll_up_button.gif';
+// import scrollDown from '/assets/sprites/icons/scroll_down_button.gif';
 
-import radioButton from '/assets/sprites/icons/radiobutton_circle.png';
+// import radioButton from '/assets/sprites/icons/radiobutton_circle.png';
 
-import healingPotionPic from '/assets/sprites/icons/healing_potion.png';
+// import healingPotionPic from '/assets/sprites/icons/healing_potion.png';
 
 // actions
 import enemyClicked from '../classes/actions/enemyClicked.js'
@@ -42,6 +43,40 @@ export default class BaseScene extends Scene {
     constructor(key) {
         super({ key });
         this.key = key;
+    }
+
+    preload(areaString, area) {
+        // Loads background images
+        this.load.image('dark-background', sceneImports.backgroundImage);
+        // ################################ Changes for each scene
+        this.load.image(areaString, area); 
+        // ################################
+        this.load.image('user-interface', sceneImports.userInterface)
+
+        // Characters
+        this.load.image('hero', sceneImports.heroImage, 41, 55);
+        this.load.image('goblin', sceneImports.goblin, 32, 32);
+        this.load.image('deathKnight', sceneImports.deathKnight);
+        this.load.image('shadow', sceneImports.shadow);
+        this.load.image('wizard', sceneImports.wizard);
+        this.load.image('ranger', sceneImports.ranger);
+        this.load.image('zombie', sceneImports.zombie);
+        this.load.image('dragon', sceneImports.dragon);
+
+        // Status Bars
+        this.load.image('statusBar100', sceneImports.statusBar100);
+        this.load.image('statusBar0', sceneImports.statusBar0)
+
+        this.load.image('scrollUp', sceneImports.scrollUp);
+        this.load.image('scrollDown', sceneImports.scrollDown);
+
+        this.load.image('radioButton', sceneImports.radioButton);
+
+        this.load.image('healingPotionPic', sceneImports.healingPotionPic);
+
+        // Colors 
+        this.neon = "#39FF14"
+
     }
 
     update(delta) {
@@ -54,7 +89,7 @@ export default class BaseScene extends Scene {
             this.mouseClickY = this.enemyFighting.y;
             // console.log("herox: ", this.hero.x) 
             // console.log(this.goblin.x - this.hero.attackRange);
-            if (this.hero.x >= this.enemyFighting.x - this.hero.attackRange && this.hero.x <= this.enemyFighting.x + this.hero.attackRange && this.hero.y >= this.enemyFighting.y - this.hero.attackRange && this.hero.y <= this.enemyFighting.y + this.hero.attackRange) {
+            if (this.hero.x >= this.enemyFighting.x - (this.hero.attackRange + (this.enemyFighting.width / 2)) && this.hero.x <= this.enemyFighting.x + (this.hero.attackRange + (this.enemyFighting.width / 2)) && this.hero.y >= this.enemyFighting.y - (this.hero.attackRange + (this.enemyFighting.height / 2)) && this.hero.y <= this.enemyFighting.y + (this.hero.attackRange + (this.enemyFighting.height / 2))) { // Sets attack range to include enemies width and height
                 this.hero.battleMode = true;
             }
             // checks if hero is within enemies range
@@ -71,8 +106,8 @@ export default class BaseScene extends Scene {
                 var adjY = 0;
             }
             else {
-                var adjX = 32;
-                var adjY = 32;
+                var adjX = this.enemyFighting.width / 2;
+                var adjY = this.enemyFighting.height / 2;
             }
             if (this.hero.x < this.mouseClickX - adjX) {
                 this.hero.x++;
@@ -119,16 +154,16 @@ export default class BaseScene extends Scene {
 
         // Enemy follows hero when hero runs away
         if (this.enemyFighting.battleMode == true && this.enemyFighting.status == "Alive") {
-            if (this.enemyFighting.x + 40 < this.hero.x) {
+            if (this.enemyFighting.x + (this.enemyFighting.width + 10) < this.hero.x) {
                 this.enemyFighting.x += this.enemyFighting.speed;
             }
-            else if (this.enemyFighting.x - 40 > this.hero.x) {
+            else if (this.enemyFighting.x - (this.enemyFighting.width + 10) > this.hero.x) {
                 this.enemyFighting.x -= this.enemyFighting.speed;
             }
-            if (this.enemyFighting.y + 40 < this.hero.y) {
+            if (this.enemyFighting.y + (this.enemyFighting.height + 10) < this.hero.y) {
                 this.enemyFighting.y += this.enemyFighting.speed;
             }
-            else if (this.enemyFighting.y - 40 > this.hero.y) {
+            else if (this.enemyFighting.y - (this.enemyFighting.height + 10) > this.hero.y) {
                 this.enemyFighting.y -= this.enemyFighting.speed;
             }
             // disables goblin battle mode once hero runs away too far
@@ -306,6 +341,7 @@ export default class BaseScene extends Scene {
                 this.hero.health = this.hero.maxhealth;
                 this.mouseClickX = 300;
                 this.mouseClickY = 300;
+                this.mouseClicked = false;
             }
             this.hero.battleMode = false;
             this.enemyFighting.battleMode = false;

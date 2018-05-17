@@ -10,10 +10,12 @@ export default class Goblin extends Phaser.GameObjects.Sprite {
         this.health = 8;
         this.maxhealth = 8;
         this.status = "Alive";
+        this.width = 32;
+        this.height = 32;
         this.respawnTime = 200;
         this.respawnTimer = 200;
         this.bounty = [5, 5, 6, 6, 8, 10];
-        this.attackRange = 70;
+        this.attackRange = 40;
         this.battleMode = false;
         this.speed = .5;
         this.x_y_whenClicked = ["", ""];

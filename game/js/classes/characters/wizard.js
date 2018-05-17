@@ -10,6 +10,8 @@ export default class Wizard extends Phaser.GameObjects.Sprite {
         this.health = 22;
         this.maxhealth = 22;
         this.status = "Alive";
+        this.width = 40;
+        this.height = 52;
         this.respawnTime = 800;
         this.respawnTimer = 800;
         this.bounty = [60, 60, 60, 70, 70, 80, 80, 90];

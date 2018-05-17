@@ -10,6 +10,8 @@ export default class Ranger extends Phaser.GameObjects.Sprite {
         this.health = 28;
         this.maxhealth = 28;
         this.status = "Alive";
+        this.width = 56;
+        this.height = 56;
         this.respawnTime = 200;
         this.respawnTimer = 200;
         this.bounty = [70, 70, 90, 90, 100, 110, 120];
