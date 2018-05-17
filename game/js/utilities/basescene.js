@@ -204,6 +204,7 @@ export default class BaseScene extends Scene {
                             count += 1;
                             
                         }
+                        this.attackPower = Math.min(this.attackPower, this.enemyFighting.health);
                             
                         if (specialAttackNumb == 0) {
                             this.attackPower = this.attackPower = Math.min(this.attackPower * 2, this.enemyFighting.health);
