@@ -45,6 +45,10 @@ export default class BaseScene extends Scene {
         this.key = key;
     }
 
+    // characterLocation(charLocation) {
+    //     this.heroLocation = charLocation
+    // }
+
     preload(areaString, area) {
         // Loads background images
         this.load.image('dark-background', sceneImports.backgroundImage);
@@ -79,10 +83,15 @@ export default class BaseScene extends Scene {
 
     }
 
-    create(areaString) {
+    create(areaString, sceneBorders, areaChanges, areaChangeTo, Enemy1, Enemy2, Enemy3, Enemy4, hero) {
         // Min and max x and y values for scene
-        this.sceneX = [40, 480];
-        this.sceneY = [40, 460];
+        this.hero = hero;
+
+        this.areaChanges = areaChanges;
+        this.areaChangeTo = areaChangeTo;
+
+        this.sceneX = sceneBorders.x;
+        this.sceneY = sceneBorders.y;
         this.gameScreen = 515   // Width and height of game screen
 
         this.mouseClicked = false;
@@ -100,51 +109,51 @@ export default class BaseScene extends Scene {
         this.radioButton = this.add.image(552, 530, 'radioButton');
         this.healingPotionPic = this.add.image(547, 325, 'healingPotionPic').setInteractive();
 
+        this.enemy1 = new Enemy1.class({
+            key: Enemy1.name,
+            scene: this,
+            walkAreaX : Enemy1.walkAreaX,
+            walkAreaY : Enemy1.walkAreaY,
+            x: Enemy1.x,
+            y: Enemy1.y,
+        }).setInteractive(); // set interactive allows pointerover event
+
+        this.enemy2 = new Enemy2.class({
+            key: Enemy2.name,
+            scene: this,
+            walkAreaX : Enemy2.walkAreaX,
+            walkAreaY : Enemy2.walkAreaY,
+            x: Enemy2.x,
+            y: Enemy2.y,
+        }).setInteractive();  // set interactive allows pointerover event
+
+        this.enemy3 = new Enemy3.class({
+            key: Enemy3.name,
+            scene: this,
+            walkAreaX : Enemy3.walkAreaX,
+            walkAreaY : Enemy3.walkAreaY,
+            x: Enemy3.x,
+            y: Enemy3.y,
+        }).setInteractive();  // set interactive allows pointerover event
+
+        this.enemy4 = new Enemy4.class({
+            key: Enemy4.name,
+            scene: this,
+            walkAreaX : Enemy4.walkAreaX,
+            walkAreaY : Enemy4.walkAreaY,
+            x: Enemy4.x,
+            y: Enemy4.y,
+        }).setInteractive(); 
+
         // Creates characters 
         this.hero = new Hero({
             key: 'hero',
             scene: this,
-            x: 100,
-            y: 200,
-        });
-
-        this.goblin = new Goblin({
-            key: 'goblin',
-            scene: this,
-            walkAreaX : [100, 200],
-            walkAreaY : [100, 300],
             x: 150,
             y: 150,
-        }).setInteractive(); // set interactive allows pointerover event
+        });
 
-        this.shadow = new Shadow({
-            key: 'shadow',
-            scene: this,
-            walkAreaX : [100, 200],
-            walkAreaY : [300, 400],
-            x: 150,
-            y: 350,
-        }).setInteractive(); // set interactive allows pointerover event
-
-        this.deathKnight = new DeathKnight({
-            key: 'deathKnight',
-            scene: this,
-            walkAreaX : [300, 400],
-            walkAreaY : [200, 400],
-            x: 350,
-            y: 250,
-        }).setInteractive(); // set interactive allows pointerover event
-
-        this.wizard = new Wizard({
-            key: 'wizard',
-            scene: this,
-            walkAreaX : [300, 400],
-            walkAreaY : [50, 170],
-            x: 350,
-            y: 100,
-        }).setInteractive();
-
-        this.enemies = [this.goblin, this.deathKnight, this.wizard, this.shadow];
+        this.enemies = [this.enemy1, this.enemy2, this.enemy3, this.enemy4];
         // this.enemies = [this.goblin];
 
         //create hero and enemy health bar off screen
@@ -306,7 +315,7 @@ export default class BaseScene extends Scene {
 
         this.timer = 0;
         this.changeDirTimer = 120;
-        this.randNumb = Math.floor(Math.random() * 4);
+        this.randNumb = [Math.floor(Math.random() * 4), Math.floor(Math.random() * 4), Math.floor(Math.random() * 4), Math.floor(Math.random() * 4)];
     }
 
     update(delta) {
@@ -358,7 +367,7 @@ export default class BaseScene extends Scene {
         
         // Enemy movement
         if (this.changeDirTimer <= 0) {
-            this.randNumb = Math.floor(Math.random() * 4);
+            this.randNumb = [Math.floor(Math.random() * 4), Math.floor(Math.random() * 4), Math.floor(Math.random() * 4), Math.floor(Math.random() * 4)];
             this.changeDirTimer = 240;
         }
 
@@ -367,16 +376,16 @@ export default class BaseScene extends Scene {
 
         for (var i = 0; i < this.enemies.length; i ++) {
             if (this.enemies[i].battleMode == false && this.enemies[i].status == "Alive") {
-                if (this.randNumb == 0 && this.enemies[i].x < this.enemies[i].walkAreaX[1]) {
+                if (this.randNumb[i] == 0 && this.enemies[i].x < this.enemies[i].walkAreaX[1]) {
                     this.enemies[i].x += this.enemies[i].speed;
                 }
-                else if (this.randNumb == 1 && this.enemies[i].x > this.enemies[i].walkAreaX[0]) {
+                else if (this.randNumb[i] == 1 && this.enemies[i].x > this.enemies[i].walkAreaX[0]) {
                     this.enemies[i].x -= this.enemies[i].speed;
                 }
-                else if (this.randNumb == 2 && this.enemies[i].y < this.enemies[i].walkAreaY[1]) {
+                else if (this.randNumb[i] == 2 && this.enemies[i].y < this.enemies[i].walkAreaY[1]) {
                     this.enemies[i].y += this.enemies[i].speed;
                 }
-                else if (this.randNumb == 3 && this.enemies[i].y > this.enemies[i].walkAreaY[0]) {
+                else if (this.randNumb[i] == 3 && this.enemies[i].y > this.enemies[i].walkAreaY[0]) {
                     this.enemies[i].y -= this.enemies[i].speed;
                 }
             }
@@ -667,7 +676,15 @@ export default class BaseScene extends Scene {
 
         this.coinText.setText(`${this.hero.coins}`);
 
-        this.healingPotionText.setText(`${this.hero.healingPotion}`)
+        this.healingPotionText.setText(`${this.hero.healingPotion}`);
+
+        // Scene transitions
+        if (this.hero.x >= this.areaChanges.westChange[0] && this.hero.x <= this.areaChanges.westChange[1]) {
+            this.sceneChange = "West";
+            this.scene.start(this.areaChangeTo.westChange, {heroX : 450});
+
+        }
+        
         
     }
 }
