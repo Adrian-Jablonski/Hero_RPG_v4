@@ -5,8 +5,8 @@ export default class Goblin extends Phaser.GameObjects.Sprite {
         this.scene.add.existing(this);
 
         this.name = "Goblin";
-        this.power = 7;
-        this.defense = 5;
+        this.power = 1;
+        this.defense = 2;
         this.health = 8;
         this.maxhealth = 8;
         this.status = "Alive";
@@ -25,5 +25,6 @@ export default class Goblin extends Phaser.GameObjects.Sprite {
         this.attackTime = 90;
         this.defenseBenefit = Math.round(this.defense * .2);
         this.defenseTimes = Math.round(this.defense / 4);
+        this.specialAttackPerc = .2;
     }    
 }

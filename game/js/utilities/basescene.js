@@ -123,6 +123,7 @@ export default class BaseScene extends Scene {
         this.attackTimer = 200;
         this.enemyFighting = "";
         this.deadEnemyList = [];
+        this.doubleDamageText = false;
 
         // Renders images and sprites to screen
         this.background1 = this.add.image(850 / 2, 700 / 2, 'dark-background');
@@ -237,6 +238,7 @@ export default class BaseScene extends Scene {
 
         // Damage text
         this.heroDamageText = this.add.text(-20, 20, "", {font:"18px 'Ariel Bold'", color:"Red"});
+        this.heroDamageText2 = this.add.text(-20, 20, "", {font:"18px 'Ariel Bold'", color:"Red"}); // For ranger special attack
         this.enemyDamageText = this.add.text(-20, 20, "", {font:"18px 'Ariel Bold'", color:"Red"});
 
         // History Log
@@ -264,89 +266,87 @@ export default class BaseScene extends Scene {
 
         // // Sets scene border so player does not move off screen (Need to find a way that this works in Phaser3)
         // this.hero.setBounds(0, 0, 800, 600);
-
-        // Moves player after releasing right keyboard button
-        this.input.keyboard.on('keyup_RIGHT', function(event) {
-            this.hero.x += 10;
-        },this);
-
-        this.key_LEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT)
         
         // Handles click events
         
         this.input.on('pointerdown', function(event) {
-
-            for (var i = 0; i < this.enemies.length; i ++) {
-                this.enemies[i].clickPosition = [this.enemies[i].x, this.enemies[i].y];
-            }
-
-            // Moves player to click location
-            console.log(this.attackTimer);
-            this.mouseClickX = event.x;
-            this.mouseClickY = event.y;
-            this.mouseClicked = true;
-            // stores enemy position on click
-            // this.goblin.clickPosition = [this.goblin.x, this.goblin.y];
-
-            // checks if enemy was clicked on
-            for (var i = 0; i < this.enemies.length; i ++) {
-                if (enemyClicked(this.mouseClickX, this.mouseClickY, this.enemies[i], this.gameScreen) == true) {
-                    this.attackEnemy = true;
-                    this.enemyFighting = this.enemies[i];
-                    console.log(this.enemyFighting);
-                    break; // breaks out of loop so that else if does not run and prevent attacking the enemy that was clicked on
+            if (this.hero.frozen == false) {
+                for (var i = 0; i < this.enemies.length; i ++) {
+                    this.enemies[i].clickPosition = [this.enemies[i].x, this.enemies[i].y];
                 }
-                else if (enemyClicked(this.mouseClickX, this.mouseClickY, this.enemies[i], this.gameScreen) == false){
-                    this.attackEnemy = false;
-                    this.hero.battleMode = false;
-                }
-            }
-
-            console.log("x: ", event.x, " y: ", event.y);
-
-            // Controls history text buttons
-            if (this.mouseClickX >= 446 && this.mouseClickX <=485 && this.mouseClickY >= 558 && this.mouseClickY <= 590) {
-                if (this.historyLineTextList.length > 6 && this.historyTextScroll < this.historyLineTextList.length - 5) {
-                    this.historyTextScroll += 1
-                }
-            }
-
-            if (this.mouseClickX >= 446 && this.mouseClickX <=485 && this.mouseClickY >= 598 && this.mouseClickY <= 630) {
-                if (this.historyLineTextList.length > 6 && this.historyTextScroll > 0) {
-                    this.historyTextScroll -= 1
-                }
-            }
-
-            // Attack stance button
-            if (attackStance(this.mouseClickX, this.mouseClickY) == "Aggressive") {
-                this.hero.attackStance = "Aggressive";
-                this.hero.powerLvAdj = this.hero.power + 3;
-                this.hero.defenseLvAdj = this.hero.defense - 3;
-            }
-            else if (attackStance(this.mouseClickX, this.mouseClickY) == "Defensive") {
-                this.hero.attackStance = "Defensive";
-                this.hero.powerLvAdj = this.hero.power - 3;
-                this.hero.defenseLvAdj = this.hero.defense + 3;
-            }
-            else if (attackStance(this.mouseClickX, this.mouseClickY) == "Normal") {
-                this.hero.attackStance = "Normal";
-                this.hero.powerLvAdj = this.hero.power;
-                this.hero.defenseLvAdj = this.hero.defense;
-            }
-
-            // healing potion
-            if (this.mouseClickX >= 538 && this.mouseClickX <= 558 && this.mouseClickY >= 315 && this.mouseClickY <= 342) {
-                if (this.hero.healingPotion > 0) {
-                    this.hero.health = Math.min(this.hero.maxhealth, (this.hero.health + 10));
-                    this.hero.healingPotion -= 1;
-                    this.historyLineTextList.unshift(`Hero drinks a healing potion`);
-                    this.historyLineTextColor.unshift("White");
-                    if (this.hero.battleMode == true) {
-                        this.hero.frozen = true;
+    
+                // Moves player to click location
+                console.log(this.attackTimer);
+                this.mouseClickX = event.x;
+                this.mouseClickY = event.y;
+                this.mouseClicked = true;
+                // stores enemy position on click
+                // this.goblin.clickPosition = [this.goblin.x, this.goblin.y];
+    
+                // checks if enemy was clicked on
+                for (var i = 0; i < this.enemies.length; i ++) {
+                    if (enemyClicked(this.mouseClickX, this.mouseClickY, this.enemies[i], this.gameScreen) == true) {
+                        this.attackEnemy = true;
+                        if (this.enemyFighting == "") {
+                            // prevents hero from starting a fight with another enemy while already attacking an enemy
+                            this.enemyFighting = this.enemies[i];
+                        }
+                        console.log(this.enemyFighting);
+                        break; // breaks out of loop so that else if does not run and prevent attacking the enemy that was clicked on
                     }
-                    
+                    else if (enemyClicked(this.mouseClickX, this.mouseClickY, this.enemies[i], this.gameScreen) == false){
+                        this.attackEnemy = false;
+                        this.hero.battleMode = false;
+                    }
+                }
+    
+                console.log("x: ", event.x, " y: ", event.y);
+    
+                // Controls history text buttons
+                if (this.mouseClickX >= 446 && this.mouseClickX <=485 && this.mouseClickY >= 558 && this.mouseClickY <= 590) {
+                    if (this.historyLineTextList.length > 6 && this.historyTextScroll < this.historyLineTextList.length - 5) {
+                        this.historyTextScroll += 1
+                    }
+                }
+    
+                if (this.mouseClickX >= 446 && this.mouseClickX <=485 && this.mouseClickY >= 598 && this.mouseClickY <= 630) {
+                    if (this.historyLineTextList.length > 6 && this.historyTextScroll > 0) {
+                        this.historyTextScroll -= 1
+                    }
+                }
+    
+                // Attack stance button
+                if (attackStance(this.mouseClickX, this.mouseClickY) == "Aggressive") {
+                    this.hero.attackStance = "Aggressive";
+                    this.hero.powerLvAdj = this.hero.power + 3;
+                    this.hero.defenseLvAdj = max(this.hero.defense - 3, 1);
+                }
+                else if (attackStance(this.mouseClickX, this.mouseClickY) == "Defensive") {
+                    this.hero.attackStance = "Defensive";
+                    this.hero.powerLvAdj = max(this.hero.power - 3, 1);
+                    this.hero.defenseLvAdj = this.hero.defense + 3;
+                }
+                else if (attackStance(this.mouseClickX, this.mouseClickY) == "Normal") {
+                    this.hero.attackStance = "Normal";
+                    this.hero.powerLvAdj = this.hero.power;
+                    this.hero.defenseLvAdj = this.hero.defense;
+                }
+    
+                // healing potion
+                if (this.mouseClickX >= 538 && this.mouseClickX <= 558 && this.mouseClickY >= 315 && this.mouseClickY <= 342) {
+                    if (this.hero.healingPotion > 0) {
+                        this.hero.health = Math.min(this.hero.maxhealth, (this.hero.health + 10));
+                        this.hero.healingPotion -= 1;
+                        this.historyLineTextList.unshift(`Hero drinks a healing potion`);
+                        this.historyLineTextColor.unshift("White");
+                        if (this.hero.battleMode == true) {
+                            this.hero.healing = true;
+                        }
+                        
+                    }
                 }
             }
+            
 
         },this);
 
@@ -394,20 +394,20 @@ export default class BaseScene extends Scene {
                 var adjY = 0;
             }
             else {
-                var adjX = this.enemyFighting.width / 2;
-                var adjY = this.enemyFighting.height / 2;
+                var adjX = this.enemyFighting.width;
+                var adjY = this.enemyFighting.height;
             }
             if (this.hero.x < this.mouseClickX - adjX) {
-                this.hero.x++;
+                this.hero.x += this.hero.speed;
             }
             if (this.hero.x > this.mouseClickX + adjX) {
-                this.hero.x--;
+                this.hero.x -= this.hero.speed;
             }
             if (this.hero.y < this.mouseClickY - adjY) {
-                this.hero.y++;
+                this.hero.y += this.hero.speed;
             }
             if (this.hero.y > this.mouseClickY + adjY) {
-                this.hero.y--;
+                this.hero.y -= this.hero.speed;
             }
             if (this.hero.x == this.mouseClickX && this.hero.y == this.mouseClickY) {
                 this.mouseClicked = false;
@@ -454,7 +454,7 @@ export default class BaseScene extends Scene {
             else if (this.enemyFighting.y - (this.enemyFighting.height + 10) > this.hero.y) {
                 this.enemyFighting.y -= this.enemyFighting.speed;
             }
-            // disables goblin battle mode once hero runs away too far
+            // disables enemy battle mode once hero runs away too far
             if (this.hero.battleMode == false) {
                 if (Math.abs(this.enemyFighting.x - this.hero.x) > this.enemyFighting.attackRange + 20) {
                     this.enemyFighting.battleMode = false;
@@ -478,7 +478,7 @@ export default class BaseScene extends Scene {
 
         // Updates when hero and enemy leave battle mode
         for (var i = 0; i < this.enemies.length; i ++) { 
-            if (this.hero.battleMode == false && this.enemies[i].battleMode == false) {
+            if (this.hero.battleMode == false && this.enemyFighting == "") {
                 // hides status bars
                 this.statusBarHero100.y = -40;
                 this.statusBarEnemy100.y= -40;
@@ -486,6 +486,7 @@ export default class BaseScene extends Scene {
                 this.statusBarEnemy0.y = -40;
                 // Clears damage text
                 this.heroDamageText.y = -50;
+                this.heroDamageText2.y = -50;
                 this.enemyDamageText.y = -50;
                 this.enemyAttackPower = "";
                 this.attackPower = "";
@@ -496,6 +497,7 @@ export default class BaseScene extends Scene {
         
             if (this.hero.battleMode == true || this.enemyFighting.battleMode == true) {
                 this.attackTimer -= 1;
+                console.log(this.attackTimer)
 
                 // Changes status bar when taking damage
                 this.statusBarHero0.x = this.hero.x;
@@ -509,15 +511,15 @@ export default class BaseScene extends Scene {
                 this.statusBarEnemy100.x = this.enemyFighting.x - (((this.enemyFighting.maxhealth - this.enemyFighting.health ) * (23 / this.enemyFighting.maxhealth))/2);
                 this.statusBarEnemy100.y = this.enemyFighting.y - 30;
                 this.statusBarEnemy100.displayWidth =  (this.enemyFighting.health / this.enemyFighting.maxhealth) * 23;
-
+                // Hero attacks enemy
                 if (this.attackTimer == this.hero.attackTime && this.hero.battleMode == true) {
                 
-                    if (this.hero.frozen == false) {
+                    if (this.hero.frozen == false && this.hero.healing == false) {
                         var count = 0;
                         // Hero special attack
                         var specialAttackNumb = Math.floor(Math.random() * (1/this.hero.specialAttackPerc));
                         // console.log(specialAttackNumb);
-                        this.attackPower = Math.floor(Math.random() * (this.hero.powerLvAdj + 1));
+                        this.attackPower = Math.floor(Math.random() * Math.max((this.hero.powerLvAdj + 4),2));
                         console.log(`${count}: Power ${this.attackPower} - Defense Benefit ${Math.max(this.hero.powerLvAdj - this.enemyFighting.defenseBenefit, 1)} -  Defense Times ${this.enemyFighting.defenseTimes}`)
                         while (this.attackPower > Math.max(this.hero.powerLvAdj - this.enemyFighting.defenseBenefit, 1) && count < this.enemyFighting.defenseTimes){
                             this.attackPower = Math.floor(Math.random() * (this.hero.powerLvAdj + 1));
@@ -527,7 +529,15 @@ export default class BaseScene extends Scene {
                             count += 1;
                             
                         }
-                        this.attackPower = Math.min(this.attackPower, this.enemyFighting.health);
+                        this.attackPower = Math.min(Math.round(this.attackPower / 3.1), this.enemyFighting.health);
+                        // Shadow special ability
+                        if (this.enemyFighting.name == "Shadow") {
+                            var enemyRandNumb = Math.floor(Math.random() * (1/this.enemyFighting.specialAttackPerc))
+                            console.log("Shadow special :", enemyRandNumb);
+                            if (enemyRandNumb != 1) {
+                                this.attackPower = 0;
+                            }
+                        }
                             
                         if (specialAttackNumb == 0) {
                             this.attackPower = this.attackPower = Math.min(this.attackPower * 2, this.enemyFighting.health);
@@ -535,7 +545,6 @@ export default class BaseScene extends Scene {
                         }
                         else {
                             this.historyLineTextList.unshift(`Hero does ${this.attackPower} damage to ${this.enemyFighting.name}`);
-                            
                         }
 
                         // console.log("Hero attacks goblin :", this.attackPower);
@@ -565,14 +574,19 @@ export default class BaseScene extends Scene {
                             this.hero.healthExp += Math.round(this.attackPower * 2.0);
                         }
                     }
-                    if (this.hero.frozen == true) {
-                        this.hero.frozen = false;
+                    if (this.hero.healing == true) {
+                        this.hero.healing = false;
                     }
                 }
+                // Enemy attacks hero
                 if (this.attackTimer == this.enemyFighting.attackTime && this.enemyFighting.battleMode == true) {
+                    this.doubleDamageText = false;
+                    this.damageTextLocationX = 5;
+                    this.hero.frozen = false; // unfreezes hero if frozen
+                    this.hero.speed = 1;
                     var count = 0;
-                    // console.log(`${count}: Power ${this.enemyAttackPower} - Defense Benefit ${Math.max(this.goblin.power - this.hero.defenseBenefit, 1)} -  Defense Times ${this.hero.defenseTimes}`)
-                    this.enemyAttackPower = Math.floor(Math.random() * (this.enemyFighting.power + 1));
+                    var specialAttackNumb = Math.floor(Math.random() * (1/this.enemyFighting.specialAttackPerc));
+                    this.enemyAttackPower = Math.floor(Math.random() * (this.enemyFighting.power + 4));
                     while (this.enemyAttackPower > Math.max(this.enemyFighting.power - this.hero.defenseBenefit, 1) && count < this.hero.defenseTimes){
                         this.enemyAttackPower = Math.floor(Math.random() * (this.enemyFighting.power + 1));
                         this.enemyAttackPower = Math.min(this.enemyAttackPower, this.hero.health);
@@ -580,7 +594,7 @@ export default class BaseScene extends Scene {
                         count += 1;
                     }
                     
-                    this.enemyAttackPower = Math.min(this.enemyAttackPower, this.hero.health);
+                    this.enemyAttackPower = Math.min(Math.round(this.enemyAttackPower / 3.1), this.hero.health);
                     this.hero.health -= this.enemyAttackPower;
                     // Sets attack number color
                     if (this.enemyAttackPower == 0) {
@@ -589,14 +603,62 @@ export default class BaseScene extends Scene {
                     else {
                         this.enemyDamageColor = "red"
                     }
-                    this.historyLineTextList.unshift(`${this.enemyFighting.name} does ${this.enemyAttackPower} damage to Hero`);
+                    console.log(specialAttackNumb);
+                    // Handles enemy special attacks
+                    if (specialAttackNumb == 0 && this.enemyFighting.name != "Shadow") {
+                        if (this.enemyFighting.name == "Goblin" && this.hero.coins >= 2) {
+                            this.hero.coins -= 2;
+                            this.historyLineTextList.unshift(`SPECIAL ATTACK ${this.enemyFighting.name} does ${this.enemyAttackPower} damage to Hero and steals 2 coins`);
+                        }
+                        else if (this.enemyFighting.name == "Death Knight") {
+                            var healing = Math.min(this.enemyAttackPower, (this.enemyFighting.maxhealth - this.enemyFighting.health));
+                            this.enemyFighting.health += healing;
+                            this.historyLineTextList.unshift(`SPECIAL ATTACK ${this.enemyFighting.name} does ${this.enemyAttackPower} damage to Hero and heals ${healing}`);
+                        }
+                        else if (this.enemyFighting.name == "Wizard") {
+                            this.hero.frozen = true;
+                            this.hero.speed = 0;
+                            this.historyLineTextList.unshift(`Hero is frozen and can't move`);
+                            this.historyLineTextColor.unshift("Blue");
+                            this.historyLineTextList.unshift(`SPECIAL ATTACK ${this.enemyFighting.name} does ${this.enemyAttackPower} damage to Hero`);
+                        }
+                        else if (this.enemyFighting.name == "Ranger") {
+                            this.damageTextLocationX = 13
+                            this.enemyAttackPower2 = Math.floor(Math.random() * (this.enemyFighting.power + 4));
+                            this.enemyAttackPower2 = Math.min(Math.round(this.enemyAttackPower2 /3.1), this.hero.health);
+                            this.hero.health -= this.enemyAttackPower2;
+                            this.historyLineTextList.unshift(`SPECIAL ATTACK ${this.enemyFighting.name} does ${this.enemyAttackPower} and ${this.enemyAttackPower2} damage to Hero`);
+                            this.doubleDamageText = true;
+                        }
+                    }
+                    else {
+                        this.historyLineTextList.unshift(`${this.enemyFighting.name} does ${this.enemyAttackPower} damage to Hero`);
+                    }
+                    
                     this.historyLineTextColor.unshift("Red");
                 }
 
                 // Shows damage above characters head
-                this.heroDamageText.x = this.hero.x - 5;
+                this.heroDamageText.x = this.hero.x - this.damageTextLocationX;
                 this.heroDamageText.y = this.hero.y - 55;
                 this.heroDamageText.setText(this.enemyAttackPower).setStyle({font:"18px Ariel Bold", color: this.enemyDamageColor});
+
+                if (this.doubleDamageText == true) {
+                    this.heroDamageText2.x = this.hero.x + 13;
+                    this.heroDamageText2.y = this.hero.y - 55;
+                    
+                    if (this.enemyAttackPower2 == 0) {
+                        this.enemyDamageColor2 = "blue"
+                    }
+                    else {
+                        this.enemyDamageColor2 = "red"
+                    }
+                    this.heroDamageText2.setText(this.enemyAttackPower2).setStyle({font:"18px Ariel Bold", color: this.enemyDamageColor2});
+                }
+                else {
+                    this.heroDamageText2.y = - 55;
+                }
+                
 
                 this.enemyDamageText.x = this.enemyFighting.x - 5;
                 this.enemyDamageText.y = this.enemyFighting.y - 55;
@@ -621,6 +683,7 @@ export default class BaseScene extends Scene {
                 this.enemyFighting.status = "Dead";
                 this.enemyFighting.y = -50;
 
+
                 // Bounty drop
             }
             else if (this.hero.health <= 0) {
@@ -634,6 +697,9 @@ export default class BaseScene extends Scene {
             this.hero.battleMode = false;
             this.enemyFighting.battleMode = false;
             this.attackEnemy = false;
+            this.hero.frozen = false;
+            this.hero.speed = 1;
+            this.doubleDamageText = false;
             
         }
 

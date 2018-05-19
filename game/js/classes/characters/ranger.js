@@ -25,5 +25,6 @@ export default class Ranger extends Phaser.GameObjects.Sprite {
         this.attackTime = 90;
         this.defenseBenefit = Math.round(this.defense * .2);
         this.defenseTimes = Math.round(this.defense / 4);
+        this.specialAttackPerc = .25;
     }    
 }

@@ -41,9 +41,9 @@ export default class Area100_100 extends BaseScene {
             westChange : "Area99_100"
         };
 
-        var Enemy1 = {class: Goblin, name: "goblin", walkAreaX: [100, 200], walkAreaY: [100, 300], x: 150, y: 150}
+        var Enemy1 = {class: Ranger, name: "ranger", walkAreaX: [100, 200], walkAreaY: [100, 300], x: 150, y: 150}
         var Enemy2 = {class: DeathKnight, name: "deathKnight", walkAreaX: [300, 400], walkAreaY: [200, 400], x: 350, y: 250}
-        var Enemy3 = {class: Shadow, name: "shadow", walkAreaX: [100, 200], walkAreaY: [350, 450], x: 150, y: 350}
+        var Enemy3 = {class: Ranger, name: "ranger", walkAreaX: [100, 200], walkAreaY: [350, 450], x: 150, y: 350}
         var Enemy4 = {class: Wizard, name: "wizard", walkAreaX: [300, 400], walkAreaY: [50, 170], x: 350, y: 100}
 
         super.create('area100_100', sceneBorders, areaChanges, areaChangeTo, Enemy1, Enemy2, Enemy3, Enemy4);

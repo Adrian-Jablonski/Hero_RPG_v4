@@ -5,10 +5,11 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.scene.add.existing(this);
 
         this.name = "Hero";
-        this.power = 8;
+        this.power = 6;
         this.defense = 20;
-        this.health = 25;
-        this.maxhealth = 25;
+        this.health = 50;
+        this.maxhealth = 50;
+        this.speed = 1;
         this.powerExp = Math.round((25 + (this.power)) * (this.power) / 1.13767) * (this.power - 1);
         this.defenseExp = Math.round((25 + (this.defense)) * (this.defense) / 1.13767) * (this.defense - 1);
         this.healthExp = Math.round((25 + (this.health)) * (this.health) / 1.13767) * (this.health - 1);
@@ -21,6 +22,7 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.attackTime = 190;
         this.healingPotion = 2;
         this.frozen = false;
+        this.healing = false;
         this.specialAttackPerc = .2;
         this.attackStance = "Aggressive";
         this.powerLvAdj = this.power + 3; // With stance bonuses
