@@ -38,7 +38,7 @@ export default class Area100_100 extends BaseScene {
         var Enemy3 = {class: Shadow, name: "shadow", walkAreaX: [100, 200], walkAreaY: [350, 450], x: 150, y: 350}
         var Enemy4 = {class: Wizard, name: "wizard", walkAreaX: [300, 400], walkAreaY: [50, 170], x: 350, y: 100}
 
-        super.create('area100_100', sceneBorders, areaChanges, areaChangeTo, Enemy1, Enemy2, Enemy3, Enemy4, this.hero);
+        super.create('area100_100', sceneBorders, areaChanges, areaChangeTo, Enemy1, Enemy2, Enemy3, Enemy4);
 
         // Changes scenes
         // this.input.keyboard.on('keyup', function(e) {
@@ -46,7 +46,7 @@ export default class Area100_100 extends BaseScene {
         //         this.scene.start("Area99_100")
         //     }
         // },this);
-        console.log("Herox:", this.hero.x);
+        // console.log("Herox:", this.hero.x);
 
     }
     

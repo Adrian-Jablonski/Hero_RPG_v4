@@ -1,0 +1,13 @@
+{
+    "Area100_100" : [
+        {
+            "name" : "area100_100",
+            "sceneBorderX" : [40, 480],
+            "sceneBorderY" : [40, 460],
+            "areaChangeNorth" : "None",
+            "areaChangeEast" : "None",
+            "areaChangeSouth" : "None",
+            "areaChangeWest" : "Area99_100"
+        }
+    ]
+}

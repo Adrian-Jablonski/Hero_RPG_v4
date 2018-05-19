@@ -45,6 +45,14 @@ export default class BaseScene extends Scene {
         this.key = key;
     }
 
+    init(data) {
+        this.data = data;
+        console.log('init', this.data);
+        this.heroStats = this.data.hero;
+        this.areaChangeType = this.data.areaChangeType;
+        console.log(this.areaChangeType)
+    }
+
     // characterLocation(charLocation) {
     //     this.heroLocation = charLocation
     // }
@@ -83,9 +91,16 @@ export default class BaseScene extends Scene {
 
     }
 
-    create(areaString, sceneBorders, areaChanges, areaChangeTo, Enemy1, Enemy2, Enemy3, Enemy4, hero) {
-        // Min and max x and y values for scene
-        this.hero = hero;
+    create(areaString, sceneBorders, areaChanges, areaChangeTo, Enemy1, Enemy2, Enemy3, Enemy4) {
+        // Creates x and y locations for the hero on scene change
+        if (this.areaChangeType == "West") {
+            this.heroXPos = sceneBorders.x[1] - 35;
+            this.heroYPos = this.heroStats.y;
+        }
+        else if (this.areaChangeType == "East") {
+            this.heroXPos = sceneBorders.x[0] + 35;
+            this.heroYPos = this.heroStats.y;
+        }
 
         this.areaChanges = areaChanges;
         this.areaChangeTo = areaChangeTo;
@@ -145,13 +160,44 @@ export default class BaseScene extends Scene {
             y: Enemy4.y,
         }).setInteractive(); 
 
+        console.log("Hero Status", this.heroStats === undefined)
         // Creates characters 
-        this.hero = new Hero({
-            key: 'hero',
-            scene: this,
-            x: 150,
-            y: 150,
-        });
+        if (this.heroStats === undefined) {
+            this.hero = new Hero({
+                key: 'hero',
+                scene: this,
+                x: 150,
+                y: 150,
+            });
+        }
+        else {
+            this.hero = new Hero({
+                key: 'hero',
+                scene: this,
+                x: this.heroXPos,
+                y: this.heroYPos,
+            });
+            // Transferring over stats from prior scene
+            this.hero.power = this.heroStats.power;
+            this.hero.defense = this.heroStats.defense;
+            this.hero.health = this.heroStats.health;
+            this.hero.maxhealth = this.heroStats.maxhealth;
+            this.hero.powerExp = this.heroStats.powerExp;
+            this.hero.defenseExp = this.heroStats.defenseExp;
+            this.hero.healthExp = this.heroStats.healthExp;
+            this.hero.nextHealthLevelExp = this.heroStats.nextHealthLevelExp;
+            this.hero.nextPowerLevelExp = this.heroStats.nextPowerLevelExp;
+            this.hero.nextDefenseLevelExp = this.heroStats.nextDefenseLevelExp;
+            this.hero.coins = this.heroStats.coins;
+            this.hero.attackStance = this.heroStats.attackStance;
+            this.hero.powerLvAdj = this.heroStats.powerLvAdj;
+            this.hero.defenseLvAdj = this.heroStats.defenseLvAdj;
+            this.hero.defenseBenefit = this.heroStats.defenseBenefit;
+            this.hero.defenseTimes = this.heroStats.defenseTimes;
+
+
+        }
+        
 
         this.enemies = [this.enemy1, this.enemy2, this.enemy3, this.enemy4];
         // this.enemies = [this.goblin];
@@ -679,10 +725,12 @@ export default class BaseScene extends Scene {
         this.healingPotionText.setText(`${this.hero.healingPotion}`);
 
         // Scene transitions
-        if (this.hero.x >= this.areaChanges.westChange[0] && this.hero.x <= this.areaChanges.westChange[1]) {
-            this.sceneChange = "West";
-            this.scene.start(this.areaChangeTo.westChange, {heroX : 450});
-
+        if (this.hero.x >= this.areaChanges.westChange[0] && this.hero.x <= this.areaChanges.westChange[1] & this.hero.y >= this.areaChanges.westChange[2] & this.hero.y <= this.areaChanges.westChange[3]) {
+            this.scene.start(this.areaChangeTo.westChange, 
+            {hero : this.hero, areaChangeType : "West"});
+        }
+        else if (this.hero.x >= this.areaChanges.eastChange[0] && this.hero.x <= this.areaChanges.eastChange[1] & this.hero.y >= this.areaChanges.eastChange[2] & this.hero.y <= this.areaChanges.eastChange[3]) {
+            this.scene.start(this.areaChangeTo.eastChange, {hero : this.hero, areaChangeType : "East"});
         }
         
         

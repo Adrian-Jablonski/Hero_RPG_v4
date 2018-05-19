@@ -47,11 +47,16 @@ export default class Area99_100 extends BaseScene {
     }
 
     create() {
-        super.characterLocation([450, 100])
 
-        var sceneBorders = {x: [40, 480], y: [40, 460]}; // Scene dimensions
-        var areaChanges = {northChange : "None", eastChange : "None", southChange : "None", westChange : "None"}; // Defines part of scene where the user transitions to other scene
-        var areaChangeTo = {northChange : "none", eastChange : "Area100_100", westChange : ""};
+        var sceneBorders = {x: [0, 480], y: [0, 460]}; // Scene dimensions
+        var areaChanges = {northChange : "None", 
+            eastChange : [sceneBorders.x[1] - 30, sceneBorders.x[1] + 30, 220, 275], 
+            southChange : "None", 
+            westChange : "None"}; // Defines part of scene where the user transitions to other scene
+        var areaChangeTo = {northChange : "none", 
+            eastChange : "Area100_100",
+            southChange : "", 
+            westChange : ""};
 
         var Enemy1 = {class: Dragon, name: "dragon", walkAreaX: [100, 200], walkAreaY: [100, 300], x: 150, y: 150}
         var Enemy2 = {class: Ranger, name: "ranger", walkAreaX: [300, 400], walkAreaY: [200, 400], x: 350, y: 250}
@@ -61,10 +66,10 @@ export default class Area99_100 extends BaseScene {
         super.create('area99_100', sceneBorders, areaChanges, areaChangeTo, Enemy1, Enemy2, Enemy3, Enemy4);
 
         // Changes scenes
-        this.input.keyboard.on('keyup', function(e) {
-            if (e.key == "1") {
-                this.scene.start("Area100_100")
-            }
-        },this);
+        // this.input.keyboard.on('keyup', function(e) {
+        //     if (e.key == "1") {
+        //         this.scene.start("Area100_100")
+        //     }
+        // },this);
     }
 }
