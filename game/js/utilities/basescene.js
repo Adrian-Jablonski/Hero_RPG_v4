@@ -93,14 +93,23 @@ export default class BaseScene extends Scene {
 
     create(areaString, sceneBorders, areaChanges, areaChangeTo, Enemy1, Enemy2, Enemy3, Enemy4) {
         // Creates x and y locations for the hero on scene change
-        if (this.areaChangeType == "West") {
-            this.heroXPos = sceneBorders.x[1] - 35;
-            this.heroYPos = this.heroStats.y;
+        if (this.areaChangeType == "North") {
+            this.heroXPos = this.heroStats.x;
+            this.heroYPos = sceneBorders.x[1] - 35;
         }
         else if (this.areaChangeType == "East") {
             this.heroXPos = sceneBorders.x[0] + 35;
             this.heroYPos = this.heroStats.y;
         }
+        else if (this.areaChangeType == "South") {
+            this.heroXPos = this.heroStats.x;
+            this.heroYPos = sceneBorders.x[0] + 35;
+        }
+        else if (this.areaChangeType == "West") {
+            this.heroXPos = sceneBorders.x[1] - 35;
+            this.heroYPos = this.heroStats.y;
+        }
+        
 
         this.areaChanges = areaChanges;
         this.areaChangeTo = areaChangeTo;
@@ -197,8 +206,6 @@ export default class BaseScene extends Scene {
 
 
         }
-        
-
         this.enemies = [this.enemy1, this.enemy2, this.enemy3, this.enemy4];
         // this.enemies = [this.goblin];
 
@@ -294,17 +301,8 @@ export default class BaseScene extends Scene {
                     this.hero.battleMode = false;
                 }
             }
-            // if (enemyClicked(this.mouseClickX, this.mouseClickY, this.goblin, this.gameScreen) == true) {
-            //     this.attackEnemy = true;
-            // }
-            // else if (enemyClicked(this.mouseClickX, this.mouseClickY, this.goblin, this.gameScreen) == false){
-            //     this.attackEnemy = false;
-            //     this.hero.battleMode = false;
-            // }
 
             console.log("x: ", event.x, " y: ", event.y);
-            //console.log("player position :", this.hero.x, this.hero.y);
-            // console.log("enemy position :", this.goblin.clickPosition);
 
             // Controls history text buttons
             if (this.mouseClickX >= 446 && this.mouseClickX <=485 && this.mouseClickY >= 558 && this.mouseClickY <= 590) {
@@ -321,27 +319,20 @@ export default class BaseScene extends Scene {
 
             // Attack stance button
             if (attackStance(this.mouseClickX, this.mouseClickY) == "Aggressive") {
-                this.radioButton.x = 552;
-                this.radioButton.y = 530;
                 this.hero.attackStance = "Aggressive";
                 this.hero.powerLvAdj = this.hero.power + 3;
                 this.hero.defenseLvAdj = this.hero.defense - 3;
             }
             else if (attackStance(this.mouseClickX, this.mouseClickY) == "Defensive") {
-                this.radioButton.x = 692;
-                this.radioButton.y = 530;
                 this.hero.attackStance = "Defensive";
                 this.hero.powerLvAdj = this.hero.power - 3;
                 this.hero.defenseLvAdj = this.hero.defense + 3;
             }
             else if (attackStance(this.mouseClickX, this.mouseClickY) == "Normal") {
-                this.radioButton.x = 552;
-                this.radioButton.y = 572;
                 this.hero.attackStance = "Normal";
                 this.hero.powerLvAdj = this.hero.power;
                 this.hero.defenseLvAdj = this.hero.defense;
             }
-            console.log(this.hero.attackStance);
 
             // healing potion
             if (this.mouseClickX >= 538 && this.mouseClickX <= 558 && this.mouseClickY >= 315 && this.mouseClickY <= 342) {
@@ -365,8 +356,20 @@ export default class BaseScene extends Scene {
     }
 
     update(delta) {
-        // this.timer += 1
-        // console.log(this.timer)
+        // Changes radio button location in attack stance section
+        if (this.hero.attackStance == "Aggressive") {
+            this.radioButton.x = 552;
+            this.radioButton.y = 530;
+        }
+        else if (this.hero.attackStance == "Defensive") {
+            this.radioButton.x = 692;
+            this.radioButton.y = 530;
+        }
+        else if (this.hero.attackStance == "Normal") {
+            this.radioButton.x = 552;
+            this.radioButton.y = 572;
+        }
+
         //Checks if enemy is within range of attacking
         if (this.attackEnemy == true || (this.enemyFighting.battleMode == true && this.attackEnemy == true)) {
             // Has hero chasing enemy 
@@ -725,14 +728,19 @@ export default class BaseScene extends Scene {
         this.healingPotionText.setText(`${this.hero.healingPotion}`);
 
         // Scene transitions
-        if (this.hero.x >= this.areaChanges.westChange[0] && this.hero.x <= this.areaChanges.westChange[1] & this.hero.y >= this.areaChanges.westChange[2] & this.hero.y <= this.areaChanges.westChange[3]) {
+        if (this.areaChanges.northChange != "" && this.hero.x >= this.areaChanges.northChange[0] && this.hero.x <= this.areaChanges.northChange[1] & this.hero.y >= this.areaChanges.northChange[2] & this.hero.y <= this.areaChanges.northChange[3]) {
+            this.scene.start(this.areaChangeTo.northChange, {hero : this.hero, areaChangeType : "North"});
+        }
+        else if (this.areaChanges.eastChange != "" && this.hero.x >= this.areaChanges.eastChange[0] && this.hero.x <= this.areaChanges.eastChange[1] & this.hero.y >= this.areaChanges.eastChange[2] & this.hero.y <= this.areaChanges.eastChange[3]) {
+            this.scene.start(this.areaChangeTo.eastChange, {hero : this.hero, areaChangeType : "East"});
+        }
+        else if (this.areaChanges.southChange != "" && this.hero.x >= this.areaChanges.southChange[0] && this.hero.x <= this.areaChanges.southChange[1] & this.hero.y >= this.areaChanges.southChange[2] & this.hero.y <= this.areaChanges.southChange[3]) {
+            this.scene.start(this.areaChangeTo.southChange, {hero : this.hero, areaChangeType : "South"});
+        }
+        else if (this.areaChanges.westChange != "" && this.hero.x >= this.areaChanges.westChange[0] && this.hero.x <= this.areaChanges.westChange[1] & this.hero.y >= this.areaChanges.westChange[2] & this.hero.y <= this.areaChanges.westChange[3]) {
             this.scene.start(this.areaChangeTo.westChange, 
             {hero : this.hero, areaChangeType : "West"});
         }
-        else if (this.hero.x >= this.areaChanges.eastChange[0] && this.hero.x <= this.areaChanges.eastChange[1] & this.hero.y >= this.areaChanges.eastChange[2] & this.hero.y <= this.areaChanges.eastChange[3]) {
-            this.scene.start(this.areaChangeTo.eastChange, {hero : this.hero, areaChangeType : "East"});
-        }
-        
         
     }
 }

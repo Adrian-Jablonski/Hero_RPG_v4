@@ -22,38 +22,21 @@ import attackStance from '../classes/actions/attackStance.js'
 export default class Area99_100 extends BaseScene {
     constructor() {
         super("Area99_100");
-        // this.init = function(data) {
-        //     console.log(data);
-        // }
     }
-    // init: function (data)
-    // {
-    //     console.log(data);
-    // },
-
-    
     
     preload() {
-         // Creates characters 
-        // console.log(this.data);
-
         super.preload('area99_100', area);
-
-        this.input.keyboard.on('keyup', function(e) {
-            if (e.key == "1") {
-                this.scene.start("Area100_100")
-            }
-        },this);
     }
 
     create() {
-
         var sceneBorders = {x: [0, 480], y: [0, 460]}; // Scene dimensions
-        var areaChanges = {northChange : "None", 
+        var areaChanges = {
+            northChange : "", 
             eastChange : [sceneBorders.x[1] - 30, sceneBorders.x[1] + 30, 220, 275], 
-            southChange : "None", 
-            westChange : "None"}; // Defines part of scene where the user transitions to other scene
-        var areaChangeTo = {northChange : "none", 
+            southChange : "", 
+            westChange : ""}; // Defines part of scene where the user transitions to other scene
+        var areaChangeTo = {
+            northChange : "", 
             eastChange : "Area100_100",
             southChange : "", 
             westChange : ""};
@@ -65,11 +48,5 @@ export default class Area99_100 extends BaseScene {
 
         super.create('area99_100', sceneBorders, areaChanges, areaChangeTo, Enemy1, Enemy2, Enemy3, Enemy4);
 
-        // Changes scenes
-        // this.input.keyboard.on('keyup', function(e) {
-        //     if (e.key == "1") {
-        //         this.scene.start("Area100_100")
-        //     }
-        // },this);
     }
 }
