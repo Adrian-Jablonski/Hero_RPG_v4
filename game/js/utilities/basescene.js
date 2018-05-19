@@ -1,18 +1,5 @@
 import {Scene} from 'phaser';
-import sceneImports from '../utilities/imports.js'; // Imports all images
-// import backgroundImage from '/assets/sprites/background-images/dark_background.png';
-// import area100_100 from '/assets/sprites/background-images/area_100_100.png';
-
-// import userInterface from '/assets/sprites/background-images/user_interface.png';
-//  // Characters
-// import heroImage from '/assets/sprites/characters/hero.png';
-// import goblin from '/assets/sprites/characters/goblin.png';
-// import deathKnight from '/assets/sprites/characters/deathKnight.png';
-// import shadow from '/assets/sprites/characters/shadow.png';
-// import wizard from '/assets/sprites/characters/wizard.png';
-// import ranger from '/assets/sprites/characters/ranger.png';
-// import zombie from '/assets/sprites/characters/zombie.png';
-// import dragon from '/assets/sprites/characters/dragon.png';
+import sceneImports from '../utilities/imports.js';
 
 // Load character objects
 import Hero from '../classes/characters/hero.js'; 
@@ -23,17 +10,6 @@ import Wizard from '../classes/characters/wizard.js';
 import Ranger from '../classes/characters/ranger.js';
 import Zombie from '../classes/characters/zombie.js';
 import Dragon from '../classes/characters/dragon.js';
-
- // Status Bars
-// import statusBar100 from '/assets/sprites/Status_Bars/Status_Bar100.png';
-// import statusBar0 from '/assets/sprites/Status_Bars/Status_Bar0.png';
-
-// import scrollUp from '/assets/sprites/icons/scroll_up_button.gif';
-// import scrollDown from '/assets/sprites/icons/scroll_down_button.gif';
-
-// import radioButton from '/assets/sprites/icons/radiobutton_circle.png';
-
-// import healingPotionPic from '/assets/sprites/icons/healing_potion.png';
 
 // actions
 import enemyClicked from '../classes/actions/enemyClicked.js'
@@ -109,6 +85,10 @@ export default class BaseScene extends Scene {
             this.heroXPos = sceneBorders.x[1] - 35;
             this.heroYPos = this.heroStats.y;
         }
+        else if (this.areaChangeType == "Death") {
+            this.heroXPos = 150;
+            this.heroYPos = 150;
+        }
         
 
         this.areaChanges = areaChanges;
@@ -151,24 +131,30 @@ export default class BaseScene extends Scene {
             x: Enemy2.x,
             y: Enemy2.y,
         }).setInteractive();  // set interactive allows pointerover event
-
-        this.enemy3 = new Enemy3.class({
-            key: Enemy3.name,
-            scene: this,
-            walkAreaX : Enemy3.walkAreaX,
-            walkAreaY : Enemy3.walkAreaY,
-            x: Enemy3.x,
-            y: Enemy3.y,
-        }).setInteractive();  // set interactive allows pointerover event
-
-        this.enemy4 = new Enemy4.class({
-            key: Enemy4.name,
-            scene: this,
-            walkAreaX : Enemy4.walkAreaX,
-            walkAreaY : Enemy4.walkAreaY,
-            x: Enemy4.x,
-            y: Enemy4.y,
-        }).setInteractive(); 
+        this.enemies = [this.enemy1, this.enemy2];
+        if (Enemy3 != "None") {
+            this.enemy3 = new Enemy3.class({
+                key: Enemy3.name,
+                scene: this,
+                walkAreaX : Enemy3.walkAreaX,
+                walkAreaY : Enemy3.walkAreaY,
+                x: Enemy3.x,
+                y: Enemy3.y,
+            }).setInteractive();  // set interactive allows pointerover event
+            this.enemies = [this.enemy1, this.enemy2, this.enemy3];
+        }
+        
+        if (Enemy4 != "None") {
+            this.enemy4 = new Enemy4.class({
+                key: Enemy4.name,
+                scene: this,
+                walkAreaX : Enemy4.walkAreaX,
+                walkAreaY : Enemy4.walkAreaY,
+                x: Enemy4.x,
+                y: Enemy4.y,
+            }).setInteractive(); 
+            this.enemies = [this.enemy1, this.enemy2, this.enemy3, this.enemy4];
+        }
 
         console.log("Hero Status", this.heroStats === undefined)
         // Creates characters 
@@ -204,11 +190,7 @@ export default class BaseScene extends Scene {
             this.hero.defenseLvAdj = this.heroStats.defenseLvAdj;
             this.hero.defenseBenefit = this.heroStats.defenseBenefit;
             this.hero.defenseTimes = this.heroStats.defenseTimes;
-
-
         }
-        this.enemies = [this.enemy1, this.enemy2, this.enemy3, this.enemy4];
-        // this.enemies = [this.goblin];
 
         //create hero and enemy health bar off screen
         this.statusBarHero0 = this.add.image(-30, - 40, 'statusBar0');
@@ -276,7 +258,6 @@ export default class BaseScene extends Scene {
                 }
     
                 // Moves player to click location
-                console.log(this.attackTimer);
                 this.mouseClickX = event.x;
                 this.mouseClickY = event.y;
                 this.mouseClicked = true;
@@ -319,11 +300,11 @@ export default class BaseScene extends Scene {
                 if (attackStance(this.mouseClickX, this.mouseClickY) == "Aggressive") {
                     this.hero.attackStance = "Aggressive";
                     this.hero.powerLvAdj = this.hero.power + 3;
-                    this.hero.defenseLvAdj = max(this.hero.defense - 3, 1);
+                    this.hero.defenseLvAdj = Math.max(this.hero.defense - 3, 1);
                 }
                 else if (attackStance(this.mouseClickX, this.mouseClickY) == "Defensive") {
                     this.hero.attackStance = "Defensive";
-                    this.hero.powerLvAdj = max(this.hero.power - 3, 1);
+                    this.hero.powerLvAdj = Math.max(this.hero.power - 3, 1);
                     this.hero.defenseLvAdj = this.hero.defense + 3;
                 }
                 else if (attackStance(this.mouseClickX, this.mouseClickY) == "Normal") {
@@ -379,12 +360,15 @@ export default class BaseScene extends Scene {
             // console.log(this.goblin.x - this.hero.attackRange);
             if (this.hero.x >= this.enemyFighting.x - (this.hero.attackRange + (this.enemyFighting.width / 2)) && this.hero.x <= this.enemyFighting.x + (this.hero.attackRange + (this.enemyFighting.width / 2)) && this.hero.y >= this.enemyFighting.y - (this.hero.attackRange + (this.enemyFighting.height / 2)) && this.hero.y <= this.enemyFighting.y + (this.hero.attackRange + (this.enemyFighting.height / 2))) { // Sets attack range to include enemies width and height
                 this.hero.battleMode = true;
+                this.hero.attackTime = 190;
+                this.enemyFighting.attackTime = 90;
             }
             // checks if hero is within enemies range
             if (this.enemyFighting.x >= this.hero.x - this.enemyFighting.attackRange && this.enemyFighting.x <= this.hero.x + this.enemyFighting.attackRange && this.enemyFighting.y >= this.hero.y - this.enemyFighting.attackRange && this.enemyFighting.y <= this.hero.y + this.enemyFighting.attackRange) {
                 this.enemyFighting.battleMode = true;
             }
         }
+
 
         // Moves player to mouse click
         if (this.mouseClicked == true && this.mouseClickX <= this.sceneX[1] + 10 && this.mouseClickX >= this.sceneX[0] - 10 && this.mouseClickY < this.sceneY[1] + 10 && this.mouseClickY > this.sceneY[0] - 10) {
@@ -442,16 +426,16 @@ export default class BaseScene extends Scene {
 
         // Enemy follows hero when hero runs away
         if (this.enemyFighting.battleMode == true && this.enemyFighting.status == "Alive") {
-            if (this.enemyFighting.x + (this.enemyFighting.width + 10) < this.hero.x) {
+            if (this.enemyFighting.x + (this.enemyFighting.attackRange) < this.hero.x) {
                 this.enemyFighting.x += this.enemyFighting.speed;
             }
-            else if (this.enemyFighting.x - (this.enemyFighting.width + 10) > this.hero.x) {
+            else if (this.enemyFighting.x - (this.enemyFighting.attackRange) > this.hero.x) {
                 this.enemyFighting.x -= this.enemyFighting.speed;
             }
-            if (this.enemyFighting.y + (this.enemyFighting.height + 10) < this.hero.y) {
+            if (this.enemyFighting.y + (this.enemyFighting.attackRange) < this.hero.y) {
                 this.enemyFighting.y += this.enemyFighting.speed;
             }
-            else if (this.enemyFighting.y - (this.enemyFighting.height + 10) > this.hero.y) {
+            else if (this.enemyFighting.y - (this.enemyFighting.attackRange) > this.hero.y) {
                 this.enemyFighting.y -= this.enemyFighting.speed;
             }
             // disables enemy battle mode once hero runs away too far
@@ -489,6 +473,7 @@ export default class BaseScene extends Scene {
                 this.heroDamageText2.y = -50;
                 this.enemyDamageText.y = -50;
                 this.enemyAttackPower = "";
+                this.enemyAttackPower2 = "";
                 this.attackPower = "";
     
                 this.attackTimer = 200;
@@ -497,7 +482,6 @@ export default class BaseScene extends Scene {
         
             if (this.hero.battleMode == true || this.enemyFighting.battleMode == true) {
                 this.attackTimer -= 1;
-                console.log(this.attackTimer)
 
                 // Changes status bar when taking damage
                 this.statusBarHero0.x = this.hero.x;
@@ -674,6 +658,7 @@ export default class BaseScene extends Scene {
             if (this.enemyFighting.health <= 0) {
                 if (this.enemyFighting.status == "Alive") { // Prevents loop that would happen until enemy respawn
                     var enemyBounty = this.enemyFighting.bounty[Math.floor(Math.random() * this.enemyFighting.bounty.length)];
+                    // Bounty drop
                     this.hero.coins += enemyBounty;
                     this.historyLineTextList.unshift(`${this.enemyFighting.name} dead. You received ${enemyBounty} coins`);
                     this.historyLineTextColor.unshift("Yellow");
@@ -682,17 +667,22 @@ export default class BaseScene extends Scene {
                 }
                 this.enemyFighting.status = "Dead";
                 this.enemyFighting.y = -50;
-
-
-                // Bounty drop
             }
             else if (this.hero.health <= 0) {
-                this.hero.x = 300;
-                this.hero.y = 300;
                 this.hero.health = this.hero.maxhealth;
-                this.mouseClickX = 300;
-                this.mouseClickY = 300;
-                this.mouseClicked = false;
+
+                if (this.key != "Area98_100") {
+                    this.scene.start("Area98_100", 
+                    {hero : this.hero, areaChangeType : "Death"});
+                }
+                else {
+                    this.hero.x = 150;
+                    this.hero.y = 150;
+                    this.mouseClickX = 150;
+                    this.mouseClickY = 150;
+                    this.mouseClicked = false;
+                }
+                
             }
             this.hero.battleMode = false;
             this.enemyFighting.battleMode = false;
@@ -700,9 +690,22 @@ export default class BaseScene extends Scene {
             this.hero.frozen = false;
             this.hero.speed = 1;
             this.doubleDamageText = false;
+            // hides status bars
+            this.statusBarHero100.y = -40;
+            this.statusBarEnemy100.y= -40;
+            this.statusBarHero0.y = -40;
+            this.statusBarEnemy0.y = -40;
+            // Clears damage text
+            this.heroDamageText.y = -50;
+            this.heroDamageText2.y = -50;
+            this.enemyDamageText.y = -50;
+            this.enemyAttackPower = "";
+            this.enemyAttackPower2 = "";
+            this.attackPower = "";
+            this.enemyFighting = "";
             
         }
-
+        
         // Enemy respawn
         try {
             if (this.deadEnemyList.length > 0) {
@@ -719,17 +722,24 @@ export default class BaseScene extends Scene {
                         
                     }
                 }
-                // if (this.enemyFighting.status == "Dead") {
-                //     this.enemyFighting.respawnTimer -= 1;
-                    
-                // }
             }
         }
         catch(err) {
             console.log(err);
         }
 
-        
+        // Enemy auto attack for higher level enemies
+        for (var i = 0; i < this.enemies.length; i ++) { 
+            if (this.enemyFighting == "" && this.hero.power + this.hero.defense + this.hero.maxhealth < this.enemies[i].power + this.enemies[i].defense + this.enemies[i].maxhealth ) {
+                // Checks if hero is within enemies range
+                if (this.enemies[i].x >= this.hero.x - this.enemies[i].attackRange && this.enemies[i].x <= this.hero.x + this.enemies[i].attackRange && this.enemies[i].y >= this.hero.y - this.enemies[i].attackRange && this.enemies[i].y <= this.hero.y + this.enemies[i].attackRange) {
+                    this.enemyFighting = this.enemies[i];
+                    this.enemyFighting.battleMode = true;
+                    this.enemyFighting.attackTime = 190;
+                    this.hero.attackTime = 90;
+                }
+            }
+        }
         
         
         // Leveling up

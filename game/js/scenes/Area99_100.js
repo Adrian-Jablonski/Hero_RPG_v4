@@ -34,12 +34,13 @@ export default class Area99_100 extends BaseScene {
             northChange : "", 
             eastChange : [sceneBorders.x[1] - 30, sceneBorders.x[1] + 30, 220, 275], 
             southChange : "", 
-            westChange : ""}; // Defines part of scene where the user transitions to other scene
+            westChange : [sceneBorders.x[0] - 30, sceneBorders.x[0] + 30, sceneBorders.y[0], sceneBorders.y[1]]}; // Defines part of scene where the user transitions to other scene
         var areaChangeTo = {
             northChange : "", 
             eastChange : "Area100_100",
             southChange : "", 
-            westChange : ""};
+            westChange : "Area98_100"
+        };
 
         var Enemy1 = {class: Dragon, name: "dragon", walkAreaX: [100, 200], walkAreaY: [100, 300], x: 150, y: 150}
         var Enemy2 = {class: Ranger, name: "ranger", walkAreaX: [300, 400], walkAreaY: [200, 400], x: 350, y: 250}
