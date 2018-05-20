@@ -1,8 +1,6 @@
 import BaseScene from '/js/utilities/basescene.js';
 import sceneImports from '../utilities/imports.js'; // Imports all images
 
-import area from '/assets/sprites/background-images/area_98_100.png';
-
 // Load character objects
 import Hero from '../classes/characters/hero.js'; 
 import Goblin from '../classes/characters/goblin.js';
@@ -13,17 +11,16 @@ import Ranger from '../classes/characters/ranger.js';
 import Zombie from '../classes/characters/zombie.js';
 import Dragon from '../classes/characters/dragon.js';
 
-// actions
-import enemyClicked from '../classes/actions/enemyClicked.js'
-import attackStance from '../classes/actions/attackStance.js'
+var currArea = [98, 100]
+import area from '/assets/sprites/background-images/area_98_100.png';
 
 export default class Area98_100 extends BaseScene {
     constructor() {
-        super("Area98_100");
+        super(`Area${currArea[0]}_${currArea[1]}`);
     }
 
     preload() {
-        super.preload('area98_100', area);
+        super.preload(`area${currArea[0]}_${currArea[1]}`, area);
     }
 
     create() {
@@ -36,7 +33,7 @@ export default class Area98_100 extends BaseScene {
         }; // Defines part of scene where the user transitions to other scene
         var areaChangeTo = {
             northChange : "Store", 
-            eastChange : "Area99_100",
+            eastChange : `Area${currArea[0] + 1}_${currArea[1]}`,
             southChange : "", 
             westChange : ""
         };
@@ -46,6 +43,6 @@ export default class Area98_100 extends BaseScene {
         var Enemy3 = "None";
         var Enemy4 = "None";
 
-        super.create('area98_100', sceneBorders, areaChanges, areaChangeTo, Enemy1, Enemy2, Enemy3, Enemy4);
+        super.create(`area${currArea[0]}_${currArea[1]}`, sceneBorders, areaChanges, areaChangeTo, Enemy1, Enemy2, Enemy3, Enemy4);
     }   
 }

@@ -5,17 +5,6 @@ import area from '/assets/sprites/background-images/Store.png';
 
 // Load character objects
 import Hero from '../classes/characters/hero.js'; 
-// import Goblin from '../classes/characters/goblin.js';
-// import DeathKnight from '../classes/characters/deathKnight.js';
-// import Shadow from '../classes/characters/shadow.js';
-// import Wizard from '../classes/characters/wizard.js';
-// import Ranger from '../classes/characters/ranger.js';
-// import Zombie from '../classes/characters/zombie.js';
-// import Dragon from '../classes/characters/dragon.js';
-
-// actions
-import enemyClicked from '../classes/actions/enemyClicked.js'
-import attackStance from '../classes/actions/attackStance.js'
 
 export default class Store extends BaseScene {
     constructor() {

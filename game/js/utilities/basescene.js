@@ -310,7 +310,7 @@ export default class BaseScene extends Scene {
                     }
                 }
     
-                // console.log("x: ", event.x, " y: ", event.y);
+                console.log("x: ", event.x, " y: ", event.y);
     
                 // Controls history text buttons
                 if (this.mouseClickX >= 446 && this.mouseClickX <=485 && this.mouseClickY >= 558 && this.mouseClickY <= 590) {
