@@ -73,7 +73,7 @@ export default class BaseScene extends Scene {
         // Creates x and y locations for the hero on scene change
         if (this.areaChangeType == "North") {
             this.heroXPos = this.heroStats.x;
-            this.heroYPos = sceneBorders.x[1] - 35;
+            this.heroYPos = sceneBorders.y[1] - 35;
         }
         else if (this.areaChangeType == "East") {
             this.heroXPos = sceneBorders.x[0] + 35;
@@ -81,7 +81,7 @@ export default class BaseScene extends Scene {
         }
         else if (this.areaChangeType == "South") {
             this.heroXPos = this.heroStats.x;
-            this.heroYPos = sceneBorders.x[0] + 35;
+            this.heroYPos = sceneBorders.y[0] + 35;
         }
         else if (this.areaChangeType == "West") {
             this.heroXPos = sceneBorders.x[1] - 35;
@@ -126,16 +126,18 @@ export default class BaseScene extends Scene {
                 x: Enemy1.x,
                 y: Enemy1.y,
             }).setInteractive(); // set interactive allows pointerover event
-    
-            this.enemy2 = new Enemy2.class({
-                key: Enemy2.name,
-                scene: this,
-                walkAreaX : Enemy2.walkAreaX,
-                walkAreaY : Enemy2.walkAreaY,
-                x: Enemy2.x,
-                y: Enemy2.y,
-            }).setInteractive();  // set interactive allows pointerover event
-            this.enemies = [this.enemy1, this.enemy2];
+            this.enemies = [this.enemy1];
+            if (Enemy2 != "None") {
+                this.enemy2 = new Enemy2.class({
+                    key: Enemy2.name,
+                    scene: this,
+                    walkAreaX : Enemy2.walkAreaX,
+                    walkAreaY : Enemy2.walkAreaY,
+                    x: Enemy2.x,
+                    y: Enemy2.y,
+                }).setInteractive();  // set interactive allows pointerover event
+                this.enemies = [this.enemy1, this.enemy2];
+            }
             if (Enemy3 != "None") {
                 this.enemy3 = new Enemy3.class({
                     key: Enemy3.name,
