@@ -26,7 +26,9 @@ export default class BaseScene extends Scene {
         console.log('init', this.data);
         this.heroStats = this.data.hero;
         this.areaChangeType = this.data.areaChangeType;
-        console.log(this.areaChangeType)
+        this.historyLog = this.data.historyLogData;
+        this.historyLogColor = this.data.historyLogColor;
+        console.log("History Log : ", this.historyLog)
     }
 
     // characterLocation(charLocation) {
@@ -114,50 +116,68 @@ export default class BaseScene extends Scene {
         this.radioButton = this.add.image(552, 530, 'radioButton');
         this.healingPotionPic = this.add.image(547, 325, 'healingPotionPic').setInteractive();
 
-        this.enemy1 = new Enemy1.class({
-            key: Enemy1.name,
-            scene: this,
-            walkAreaX : Enemy1.walkAreaX,
-            walkAreaY : Enemy1.walkAreaY,
-            x: Enemy1.x,
-            y: Enemy1.y,
-        }).setInteractive(); // set interactive allows pointerover event
-
-        this.enemy2 = new Enemy2.class({
-            key: Enemy2.name,
-            scene: this,
-            walkAreaX : Enemy2.walkAreaX,
-            walkAreaY : Enemy2.walkAreaY,
-            x: Enemy2.x,
-            y: Enemy2.y,
-        }).setInteractive();  // set interactive allows pointerover event
-        this.enemies = [this.enemy1, this.enemy2];
-        if (Enemy3 != "None") {
-            this.enemy3 = new Enemy3.class({
-                key: Enemy3.name,
+        if (this.key != "Store") {
+            // Creates characters
+            this.enemy1 = new Enemy1.class({
+                key: Enemy1.name,
                 scene: this,
-                walkAreaX : Enemy3.walkAreaX,
-                walkAreaY : Enemy3.walkAreaY,
-                x: Enemy3.x,
-                y: Enemy3.y,
+                walkAreaX : Enemy1.walkAreaX,
+                walkAreaY : Enemy1.walkAreaY,
+                x: Enemy1.x,
+                y: Enemy1.y,
+            }).setInteractive(); // set interactive allows pointerover event
+    
+            this.enemy2 = new Enemy2.class({
+                key: Enemy2.name,
+                scene: this,
+                walkAreaX : Enemy2.walkAreaX,
+                walkAreaY : Enemy2.walkAreaY,
+                x: Enemy2.x,
+                y: Enemy2.y,
             }).setInteractive();  // set interactive allows pointerover event
-            this.enemies = [this.enemy1, this.enemy2, this.enemy3];
-        }
-        
-        if (Enemy4 != "None") {
-            this.enemy4 = new Enemy4.class({
-                key: Enemy4.name,
-                scene: this,
-                walkAreaX : Enemy4.walkAreaX,
-                walkAreaY : Enemy4.walkAreaY,
-                x: Enemy4.x,
-                y: Enemy4.y,
-            }).setInteractive(); 
-            this.enemies = [this.enemy1, this.enemy2, this.enemy3, this.enemy4];
+            this.enemies = [this.enemy1, this.enemy2];
+            if (Enemy3 != "None") {
+                this.enemy3 = new Enemy3.class({
+                    key: Enemy3.name,
+                    scene: this,
+                    walkAreaX : Enemy3.walkAreaX,
+                    walkAreaY : Enemy3.walkAreaY,
+                    x: Enemy3.x,
+                    y: Enemy3.y,
+                }).setInteractive();  // set interactive allows pointerover event
+                this.enemies = [this.enemy1, this.enemy2, this.enemy3];
+            }
+            
+            if (Enemy4 != "None") {
+                this.enemy4 = new Enemy4.class({
+                    key: Enemy4.name,
+                    scene: this,
+                    walkAreaX : Enemy4.walkAreaX,
+                    walkAreaY : Enemy4.walkAreaY,
+                    x: Enemy4.x,
+                    y: Enemy4.y,
+                }).setInteractive(); 
+                this.enemies = [this.enemy1, this.enemy2, this.enemy3, this.enemy4];
+            }
+    
+            console.log("Hero Status", this.heroStats === undefined)
         }
 
-        console.log("Hero Status", this.heroStats === undefined)
-        // Creates characters 
+        else {
+            console.log("Store");
+            this.heroXPos = 450;
+            this.heroYPos = 200;
+            // Creating enemy off screen to prevent errors
+            this.enemy1 = new Goblin({
+                key: 'goblin',
+                scene: this,
+                walkAreaX : [-30, -50],
+                walkAreaY : [-30, -50],
+                x: -40,
+                y: -40,
+            }).setInteractive();
+            this.enemies = [this.enemy1];
+        }
         if (this.heroStats === undefined) {
             this.hero = new Hero({
                 key: 'hero',
@@ -190,6 +210,8 @@ export default class BaseScene extends Scene {
             this.hero.defenseLvAdj = this.heroStats.defenseLvAdj;
             this.hero.defenseBenefit = this.heroStats.defenseBenefit;
             this.hero.defenseTimes = this.heroStats.defenseTimes;
+            this.hero.items.healingPotion = this.heroStats.items.healingPotion
+
         }
 
         //create hero and enemy health bar off screen
@@ -216,7 +238,7 @@ export default class BaseScene extends Scene {
         this.heroHealthExpText = this.add.text(545, 245, `Current Exp: ${this.hero.healthExp}        Next Level: ${this.hero.nextHealthLevelExp}`, {font:"14px Ariel", color:"Red"});
 
         // Inventory
-        this.healingPotionText = this.add.text(705, 317, `${this.hero.healingPotion}`, {font:"20px Ariel", color:"Red"})
+        this.healingPotionText = this.add.text(705, 317, `${this.hero.items.healingPotion}`, {font:"20px Ariel", color:"Red"})
 
         // Damage text
         this.heroDamageText = this.add.text(-20, 20, "", {font:"18px 'Ariel Bold'", color:"Red"});
@@ -237,9 +259,16 @@ export default class BaseScene extends Scene {
 
         this.coinText = this.add.text(705, 578, `${this.hero.coins}`, {color:"Yellow"})
 
+        
         this.historyLineTextList = [];
         this.historyLineTextColor = [];
+        
+        // else {
+        //     this.historyLineTextList = this.historyLog;
+        //     this.historyLineTextColor = this.historyLogColor;
+        // }
         this.historyTextScroll = 0;
+        
 
         for (var i = 0; i < this.enemies.length; i ++) {
             this.enemies[i].text = this.add.text(20, 0, "", {font:"24px Ariel", color:"Red"}); // Hover text
@@ -281,7 +310,7 @@ export default class BaseScene extends Scene {
                     }
                 }
     
-                console.log("x: ", event.x, " y: ", event.y);
+                // console.log("x: ", event.x, " y: ", event.y);
     
                 // Controls history text buttons
                 if (this.mouseClickX >= 446 && this.mouseClickX <=485 && this.mouseClickY >= 558 && this.mouseClickY <= 590) {
@@ -315,9 +344,9 @@ export default class BaseScene extends Scene {
     
                 // healing potion
                 if (this.mouseClickX >= 538 && this.mouseClickX <= 558 && this.mouseClickY >= 315 && this.mouseClickY <= 342) {
-                    if (this.hero.healingPotion > 0) {
+                    if (this.hero.items.healingPotion > 0) {
                         this.hero.health = Math.min(this.hero.maxhealth, (this.hero.health + 10));
-                        this.hero.healingPotion -= 1;
+                        this.hero.items.healingPotion -= 1;
                         this.historyLineTextList.unshift(`Hero drinks a healing potion`);
                         this.historyLineTextColor.unshift("White");
                         if (this.hero.battleMode == true) {
@@ -801,7 +830,7 @@ export default class BaseScene extends Scene {
 
         this.coinText.setText(`${this.hero.coins}`);
 
-        this.healingPotionText.setText(`${this.hero.healingPotion}`);
+        this.healingPotionText.setText(`${this.hero.items.healingPotion}`);
 
         // Scene transitions
         if (this.areaChanges.northChange != "" && this.hero.x >= this.areaChanges.northChange[0] && this.hero.x <= this.areaChanges.northChange[1] & this.hero.y >= this.areaChanges.northChange[2] & this.hero.y <= this.areaChanges.northChange[3]) {
@@ -815,8 +844,8 @@ export default class BaseScene extends Scene {
         }
         else if (this.areaChanges.westChange != "" && this.hero.x >= this.areaChanges.westChange[0] && this.hero.x <= this.areaChanges.westChange[1] & this.hero.y >= this.areaChanges.westChange[2] & this.hero.y <= this.areaChanges.westChange[3]) {
             this.scene.start(this.areaChangeTo.westChange, 
-            {hero : this.hero, areaChangeType : "West"});
+            {hero : this.hero, areaChangeType : "West", historyLogData : this.historyLineTextList, historyLogColor : this.historyLineTextColor});
         }
-        
     }
+
 }

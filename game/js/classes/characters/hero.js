@@ -20,7 +20,10 @@ export default class Hero extends Phaser.GameObjects.Sprite {
         this.attackRange = 50;
         this.battleMode = false;
         this.attackTime = 190;
-        this.healingPotion = 2;
+        this.items = {
+            "healingPotion" : 2
+        }
+        // this.healingPotion = 2;
         this.frozen = false;
         this.healing = false;
         this.specialAttackPerc = .2;
