@@ -402,8 +402,21 @@ export default class BaseScene extends Scene {
 
 
         // Moves player to mouse click
-        if (this.mouseClicked == true && this.mouseClickX <= this.sceneX[1] + 10 && this.mouseClickX >= this.sceneX[0] - 10 && this.mouseClickY < this.sceneY[1] + 10 && this.mouseClickY > this.sceneY[0] - 10) {
+        if (this.mouseClicked == true && this.mouseClickX <= 515 && this.mouseClickX >= 0 && this.mouseClickY <= 515 && this.mouseClickY >= 30) {
             // Prevents hero from standing on enemy during battle
+            if (this.mouseClickX <= this.sceneX[0]) {
+                this.mouseClickX = this.sceneX[0]
+            }
+            else if (this.mouseClickX >= this.sceneX[1]) {
+                this.mouseClickX = this.sceneX[1]
+            }
+            if (this.mouseClickY <= this.sceneY[0]) {
+                this.mouseClickY = this.sceneY[0]
+            }
+            else if (this.mouseClickY >= this.sceneY[1]) {
+                this.mouseClickY = this.sceneY[1]
+            }
+
             if (this.attackEnemy == false) {
                 var adjX = 0;
                 var adjY = 0;

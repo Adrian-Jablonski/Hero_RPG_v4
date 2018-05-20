@@ -24,7 +24,7 @@ export default class Area100_105 extends BaseScene {
     }
 
     create() {
-        var sceneBorders = {x: [90, 370], y: [183, 490]}; // Scene dimensions
+        var sceneBorders = {x: [90, 385], y: [220, 480]}; // Scene dimensions
         var areaChanges = {
             northChange : "", 
             eastChange : [sceneBorders.x[1] - 30,
