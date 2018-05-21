@@ -24,7 +24,7 @@ export default class Area101_111 extends BaseScene {
     }
 
     create() {
-        var sceneBorders = {x: [20, 480], y: [60, 450]}; // Scene dimensions
+        var sceneBorders = {x: [50, 480], y: [125, 440]}; // Scene dimensions
         var areaChanges = {
             northChange : [150,
                 250, 
@@ -44,7 +44,7 @@ export default class Area101_111 extends BaseScene {
             westChange : `Area${currArea[0] - 1}_${currArea[1]}`
         }
 
-        var Enemy1 = {class: Dragon, name: "dragon", walkAreaX: [100, 200], walkAreaY: [100, 300], x: 150, y: 150}
+        var Enemy1 = {class: Dragon, name: "dragon", walkAreaX: [70, 180], walkAreaY: [150, 300], x: 180, y: 150}
         var Enemy2 = "None"
         var Enemy3 = "None"
         var Enemy4 = "None"
