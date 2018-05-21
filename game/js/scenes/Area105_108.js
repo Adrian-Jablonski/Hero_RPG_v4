@@ -11,10 +11,10 @@ import Ranger from '../classes/characters/ranger.js';
 import Zombie from '../classes/characters/zombie.js';
 import Dragon from '../classes/characters/dragon.js';
 
-var currArea = [102, 105];
-import area from '/assets/sprites/background-images/area_102_105.png';
+var currArea = [105, 108];
+import area from '/assets/sprites/background-images/area_105_108.png';
 
-export default class Area102_105 extends BaseScene {
+export default class Area105_108 extends BaseScene {
     constructor() {
         super(`Area${currArea[0]}_${currArea[1]}`);
     }
@@ -24,17 +24,16 @@ export default class Area102_105 extends BaseScene {
     }
 
     create() {
-        var sceneBorders = {x: [20, 385], y: [140, 317]}; // Scene dimensions
+        var sceneBorders = {x: [20, 470], y: [180, 480]}; // Scene dimensions
         var areaChanges = {
             northChange : [
-                135,
-                280, 
+                200,
+                270, 
                 sceneBorders.y[0] - 30,
                 sceneBorders.y[0] + 30], 
             eastChange : "", 
             southChange : "", 
-            westChange : [
-                sceneBorders.x[0] - 30,
+            westChange : [sceneBorders.x[0] - 30,
                 sceneBorders.x[0] + 30, 
                 sceneBorders.y[0],
                 sceneBorders.y[1]]

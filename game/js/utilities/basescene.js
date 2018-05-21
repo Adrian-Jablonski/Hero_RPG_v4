@@ -118,14 +118,17 @@ export default class BaseScene extends Scene {
 
         if (this.key != "Store") {
             // Creates characters
-            this.enemy1 = new Enemy1.class({
-                key: Enemy1.name,
-                scene: this,
-                walkAreaX : Enemy1.walkAreaX,
-                walkAreaY : Enemy1.walkAreaY,
-                x: Enemy1.x,
-                y: Enemy1.y,
-            }).setInteractive(); // set interactive allows pointerover event
+            this.enemies = [];
+            if(Enemy1 != "None") {
+                this.enemy1 = new Enemy1.class({
+                    key: Enemy1.name,
+                    scene: this,
+                    walkAreaX : Enemy1.walkAreaX,
+                    walkAreaY : Enemy1.walkAreaY,
+                    x: Enemy1.x,
+                    y: Enemy1.y,
+                }).setInteractive(); // set interactive allows pointerover event
+            }
             this.enemies = [this.enemy1];
             if (Enemy2 != "None") {
                 this.enemy2 = new Enemy2.class({
@@ -173,12 +176,12 @@ export default class BaseScene extends Scene {
             this.enemy1 = new Goblin({
                 key: 'goblin',
                 scene: this,
-                walkAreaX : [-30, -50],
-                walkAreaY : [-30, -50],
-                x: -40,
-                y: -40,
+                walkAreaX : [-80, -100],
+                walkAreaY : [-80, -100],
+                x: -90,
+                y: -90,
             }).setInteractive();
-            this.enemies = [this.enemy1];
+            this.enemies = [];
         }
         if (this.heroStats === undefined) {
             this.hero = new Hero({

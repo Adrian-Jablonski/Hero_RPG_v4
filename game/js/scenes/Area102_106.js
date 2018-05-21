@@ -34,8 +34,8 @@ export default class Area102_106 extends BaseScene {
             eastChange : 
                 [sceneBorders.x[1] - 30,
                 sceneBorders.x[1] + 30, 
-                185,
-                255], 
+                sceneBorders.y[0],
+                sceneBorders.y[1]], 
             southChange : [
                 135,
                 280, 
