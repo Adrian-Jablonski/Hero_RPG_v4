@@ -44,9 +44,9 @@ export default class Area101_111 extends BaseScene {
             westChange : `Area${currArea[0] - 1}_${currArea[1]}`
         }
 
-        var Enemy1 = {class: Wizard, name: "wizard", walkAreaX: [100, 200], walkAreaY: [100, 300], x: 150, y: 150}
-        var Enemy2 = {class: Wizard, name: "wizard", walkAreaX: [300, 400], walkAreaY: [200, 400], x: 350, y: 250}
-        var Enemy3 = {class: Wizard, name: "wizard", walkAreaX: [100, 200], walkAreaY: [350, 450], x: 150, y: 350}
+        var Enemy1 = {class: Dragon, name: "dragon", walkAreaX: [100, 200], walkAreaY: [100, 300], x: 150, y: 150}
+        var Enemy2 = "None"
+        var Enemy3 = "None"
         var Enemy4 = "None"
 
         super.create(`area${currArea[0]}_${currArea[1]}`, sceneBorders, areaChanges, areaChangeTo, Enemy1, Enemy2, Enemy3, Enemy4);

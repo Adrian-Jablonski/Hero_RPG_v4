@@ -52,7 +52,7 @@ export default class Area99_100 extends BaseScene {
 
         var Enemy1 = {class: Goblin, name: "goblin", walkAreaX: [100, 200], walkAreaY: [100, 300], x: 150, y: 150}
         var Enemy2 = {class: Goblin, name: "goblin", walkAreaX: [300, 400], walkAreaY: [200, 400], x: 350, y: 250}
-        var Enemy3 = {class: Goblin, name: "goblin", walkAreaX: [60, 160], walkAreaY: [350, 450], x: 150, y: 350}
+        var Enemy3 = "None";
         var Enemy4 = "None";
 
         super.create(`area${currArea[0]}_${currArea[1]}`, sceneBorders, areaChanges, areaChangeTo, Enemy1, Enemy2, Enemy3, Enemy4);

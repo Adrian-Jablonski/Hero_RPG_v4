@@ -24,11 +24,11 @@ export default class Area103_106 extends BaseScene {
     }
 
     create() {
-        var sceneBorders = {x: [20, 350], y: [20, 380]}; // Scene dimensions
+        var sceneBorders = {x: [20, 199], y: [20, 365]}; // Scene dimensions
         var areaChanges = {
             northChange : [
                 sceneBorders.x[0],
-                sceneBorders.x[1] - 30, 
+                sceneBorders.x[1], 
                 sceneBorders.y[0] - 30,
                 sceneBorders.y[0] + 30], 
             eastChange : "", 
@@ -46,9 +46,9 @@ export default class Area103_106 extends BaseScene {
             westChange : `Area${currArea[0] - 1}_${currArea[1]}`
         }
 
-        var Enemy1 = {class: Shadow, name: "shadow", walkAreaX: [100, 200], walkAreaY: [100, 300], x: 150, y: 150}
-        var Enemy2 = {class: Shadow, name: "shadow", walkAreaX: [300, 400], walkAreaY: [200, 400], x: 350, y: 250}
-        var Enemy3 = {class: Shadow, name: "shadow", walkAreaX: [100, 200], walkAreaY: [350, 450], x: 150, y: 350}
+        var Enemy1 = {class: Ranger, name: "ranger", walkAreaX: [150, 200], walkAreaY: [50, 150], x: 170, y: 100}
+        var Enemy2 = {class: Shadow, name: "shadow", walkAreaX: [50, 200], walkAreaY: [200, 350], x: 100, y: 250}
+        var Enemy3 = "None"
         var Enemy4 = "None"
 
         super.create(`area${currArea[0]}_${currArea[1]}`, sceneBorders, areaChanges, areaChangeTo, Enemy1, Enemy2, Enemy3, Enemy4);
