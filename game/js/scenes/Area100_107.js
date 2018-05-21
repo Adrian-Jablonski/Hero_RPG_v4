@@ -50,8 +50,8 @@ export default class Area100_107 extends BaseScene {
             westChange : `Area${currArea[0] - 1}_${currArea[1]}`
         }
 
-        var Enemy1 = {class: Zombie, name: "zombie", walkAreaX: [100, 200], walkAreaY: [250, 350], x: 150, y: 300}
-        var Enemy2 = {class: Zombie, name: "zombie", walkAreaX: [300, 400], walkAreaY: [200, 400], x: 350, y: 250}
+        var Enemy1 = {class: Zombie, name: "zombie", walkAreaX: [120, 260], walkAreaY: [250, 350], x: 150, y: 300}
+        var Enemy2 = {class: Zombie, name: "zombie", walkAreaX: [300, 400], walkAreaY: [220, 400], x: 350, y: 250}
         var Enemy3 = "None"
         var Enemy4 = "None"
 

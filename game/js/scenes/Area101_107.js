@@ -47,7 +47,7 @@ export default class Area101_107 extends BaseScene {
         }
 
         var Enemy1 = {class: Zombie, name: "zombie", walkAreaX: [100, 200], walkAreaY: [250, 350], x: 150, y: 300}
-        var Enemy2 = {class: Zombie, name: "zombie", walkAreaX: [300, 400], walkAreaY: [200, 400], x: 350, y: 250}
+        var Enemy2 = {class: Zombie, name: "zombie", walkAreaX: [230, 350], walkAreaY: [240, 400], x: 320, y: 280}
         var Enemy3 = "None"
         var Enemy4 = "None"
 

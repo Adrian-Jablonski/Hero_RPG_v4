@@ -46,7 +46,7 @@ export default class Store extends BaseScene {
             if (e.key == "9") {
                 this.scene.start("Area98_100", {hero : this.hero, areaChangeType : "East"});
             }
-            else if (e.key == "1") {
+            else if (e.key == "1" && this.hero.coins > 15) {
                 this.hero.items.healingPotion += 1;
                 this.hero.coins -= 15;
             }
