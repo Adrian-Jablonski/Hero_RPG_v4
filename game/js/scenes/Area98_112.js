@@ -11,10 +11,10 @@ import Ranger from '../classes/characters/ranger.js';
 import Zombie from '../classes/characters/zombie.js';
 import Dragon from '../classes/characters/dragon.js';
 
-var currArea = [101, 111];
-import area from '/assets/sprites/background-images/area_101_111.png';
+var currArea = [98, 112];
+import area from '/assets/sprites/background-images/area_98_112.png';
 
-export default class Area101_111 extends BaseScene {
+export default class Area98_112 extends BaseScene {
     constructor() {
         super(`Area${currArea[0]}_${currArea[1]}`);
     }
@@ -24,16 +24,13 @@ export default class Area101_111 extends BaseScene {
     }
 
     create() {
-        var sceneBorders = {x: [50, 480], y: [125, 440]}; // Scene dimensions
+        var sceneBorders = {x: [60, 480], y: [105, 400]}; // Scene dimensions
         var areaChanges = {
-            northChange : [190,
-                310, 
-                sceneBorders.y[0] - 30,
-                sceneBorders.y[0] + 30], 
+            northChange : "", 
             eastChange : [sceneBorders.x[1] - 30,
-                sceneBorders.x[1] + 30, 
-                sceneBorders.y[0],
-                sceneBorders.y[1]], 
+            sceneBorders.x[1] + 30, 
+            sceneBorders.y[0],
+            sceneBorders.y[1]], 
             southChange : "", 
             westChange : ""
         }; // Defines part of scene where the user transitions to other scene
@@ -44,8 +41,8 @@ export default class Area101_111 extends BaseScene {
             westChange : `Area${currArea[0] - 1}_${currArea[1]}`
         }
 
-        var Enemy1 = {class: Dragon, name: "dragon", walkAreaX: [70, 180], walkAreaY: [150, 300], x: 180, y: 150}
-        var Enemy2 = "None"
+        var Enemy1 = {class: Dragon, name: "dragon", walkAreaX: [70, 110], walkAreaY: [150, 200], x: 180, y: 160}
+        var Enemy2 = {class: Dragon, name: "dragon", walkAreaX: [120, 160], walkAreaY: [310, 380], x: 180, y: 360}
         var Enemy3 = "None"
         var Enemy4 = "None"
 

@@ -17,7 +17,7 @@ export default class Zombie extends Phaser.GameObjects.Sprite {
         this.bounty = [100, 100, 150, 150, 200, 250];
         this.attackRange = 60;
         this.battleMode = false;
-        this.speed = .5;
+        this.speed = .4;
         this.x_y_whenClicked = ["", ""];
         this.damage = "";
         this.walkAreaX = config.walkAreaX;

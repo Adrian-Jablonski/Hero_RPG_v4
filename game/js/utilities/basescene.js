@@ -188,7 +188,7 @@ export default class BaseScene extends Scene {
                 key: 'hero',
                 scene: this,
                 x: 150,
-                y: 150,
+                y: 250,
             });
         }
         else {

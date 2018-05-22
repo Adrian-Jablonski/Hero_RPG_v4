@@ -17,7 +17,7 @@ export default class Dragon extends Phaser.GameObjects.Sprite {
         this.bounty = [400, 500, 700, 800];
         this.attackRange = 220;
         this.battleMode = false;
-        this.speed = .5;
+        this.speed = .3;
         this.x_y_whenClicked = ["", ""];
         this.damage = "";
         this.walkAreaX = config.walkAreaX;

@@ -11,10 +11,10 @@ import Ranger from '../classes/characters/ranger.js';
 import Zombie from '../classes/characters/zombie.js';
 import Dragon from '../classes/characters/dragon.js';
 
-var currArea = [101, 111];
-import area from '/assets/sprites/background-images/area_101_111.png';
+var currArea = [100, 112];
+import area from '/assets/sprites/background-images/area_100_112.png';
 
-export default class Area101_111 extends BaseScene {
+export default class Area100_112 extends BaseScene {
     constructor() {
         super(`Area${currArea[0]}_${currArea[1]}`);
     }
@@ -24,18 +24,18 @@ export default class Area101_111 extends BaseScene {
     }
 
     create() {
-        var sceneBorders = {x: [50, 480], y: [125, 440]}; // Scene dimensions
+        var sceneBorders = {x: [20, 480], y: [105, 425]}; // Scene dimensions
         var areaChanges = {
-            northChange : [190,
-                310, 
-                sceneBorders.y[0] - 30,
-                sceneBorders.y[0] + 30], 
+            northChange : "", 
             eastChange : [sceneBorders.x[1] - 30,
-                sceneBorders.x[1] + 30, 
-                sceneBorders.y[0],
-                sceneBorders.y[1]], 
+            sceneBorders.x[1] + 30, 
+            sceneBorders.y[0],
+            sceneBorders.y[1]], 
             southChange : "", 
-            westChange : ""
+            westChange : [sceneBorders.x[0] - 30,
+            sceneBorders.x[0] + 30, 
+            sceneBorders.y[0],
+            sceneBorders.y[1]]
         }; // Defines part of scene where the user transitions to other scene
         var areaChangeTo = {
             northChange : `Area${currArea[0]}_${currArea[1] + 1}`, 
@@ -44,9 +44,9 @@ export default class Area101_111 extends BaseScene {
             westChange : `Area${currArea[0] - 1}_${currArea[1]}`
         }
 
-        var Enemy1 = {class: Dragon, name: "dragon", walkAreaX: [70, 180], walkAreaY: [150, 300], x: 180, y: 150}
-        var Enemy2 = "None"
-        var Enemy3 = "None"
+        var Enemy1 = {class: Dragon, name: "dragon", walkAreaX: [60, 110], walkAreaY: [150, 200], x: 80, y: 160}
+        var Enemy2 = {class: Dragon, name: "dragon", walkAreaX: [300, 380], walkAreaY: [110, 170], x: 310, y: 160}
+        var Enemy3 = {class: Dragon, name: "dragon", walkAreaX: [200, 280], walkAreaY: [310, 390], x: 220, y: 340}
         var Enemy4 = "None"
 
         super.create(`area${currArea[0]}_${currArea[1]}`, sceneBorders, areaChanges, areaChangeTo, Enemy1, Enemy2, Enemy3, Enemy4);
