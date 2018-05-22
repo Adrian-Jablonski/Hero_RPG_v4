@@ -63,6 +63,11 @@ export default class BaseScene extends Scene {
         this.load.image('radioButton', sceneImports.radioButton);
 
         this.load.image('healingPotionPic', sceneImports.healingPotionPic);
+        this.load.image('sword', sceneImports.sword);
+        this.load.image('helmet', sceneImports.helmet);
+        this.load.image('shield', sceneImports.shield);
+        this.load.image('chainmail', sceneImports.chainmail);
+        this.load.image('zombieAxe', sceneImports.zombieAxe);
 
         // Colors 
         this.neon = "#39FF14"
@@ -115,6 +120,9 @@ export default class BaseScene extends Scene {
         this.scrollDown = this.add.image(465, 610, 'scrollDown');
         this.radioButton = this.add.image(552, 530, 'radioButton');
         this.healingPotionPic = this.add.image(547, 325, 'healingPotionPic').setInteractive();
+        // Adds images off screen to be able to user hover over text later
+        this.sword = this.add.image(-50, -50, 'sword').setInteractive();
+        this.zombieAxe = this.add.image(-50, -50, 'zombieAxe').setInteractive();
 
         if (this.key != "Store") {
             // Creates characters
@@ -215,7 +223,16 @@ export default class BaseScene extends Scene {
             this.hero.defenseLvAdj = this.heroStats.defenseLvAdj;
             this.hero.defenseBenefit = this.heroStats.defenseBenefit;
             this.hero.defenseTimes = this.heroStats.defenseTimes;
-            this.hero.items.healingPotion = this.heroStats.items.healingPotion
+            this.hero.items.healingPotion = this.heroStats.items.healingPotion;
+            this.hero.items = this.heroStats.items;
+            this.hero.helmetSlot = this.heroStats.helmetSlot;
+            this.hero.helmetSlotIndex = this.heroStats.helmetSlotIndex
+            this.hero.bodySlot = this.heroStats.bodySlot;
+            this.hero.bodySlotIndex = this.heroStats.bodySlotIndex
+            this.hero.weaponSlot = this.heroStats.weaponSlot;
+            this.hero.weaponSlotIndex = this.heroStats.weaponSlotIndex
+            this.hero.shieldSlot = this.heroStats.shieldSlot;
+            this.hero.shieldSlotIndex = this.heroStats.shieldSlotIndex
 
         }
 
@@ -279,6 +296,7 @@ export default class BaseScene extends Scene {
             this.enemies[i].text = this.add.text(20, 0, "", {font:"24px Ariel", color:"Red"}); // Hover text
         }
         this.healingPotionPic.text = this.add.text(20, 0, "", {font:"24px Ariel", color:"Red"});
+        this.sword.text = this.add.text(20, 0, "", {font:"24px Ariel", color:"Red"});
 
         // // Sets scene border so player does not move off screen (Need to find a way that this works in Phaser3)
         // this.hero.setBounds(0, 0, 800, 600);
@@ -359,6 +377,33 @@ export default class BaseScene extends Scene {
                         }
                         
                     }
+                }
+                // Equipment
+                if (this.mouseClickX >= 672 && this.mouseClickX <=708 && this.mouseClickY >= 390 && this.mouseClickY <= 426) {
+
+                    if (this.hero.weaponSlotIndex == 0) {
+                        this.hero.weaponSlotIndex += 1;
+                        // if (this.hero.items.sword == 1) {
+                       
+                        // }
+                    }
+                    
+                    else if (this.hero.weaponSlotIndex == 1) {
+                        // if (this.hero.weaponSlotIndex == 1) {
+                        //     this.zombieAxe.x = 690;
+                        //     this.zombieAxe.y = 405;
+                        //     this.sword.y = -50;
+                        this.hero.weaponSlotIndex += 1;
+                        // }
+
+                    }
+                    else if (this.hero.weaponSlotIndex == 2) {
+                        // this.zombieAxe.y = -50;
+                        // this.sword.y = -50;
+                        this.hero.weaponSlotIndex = 0; 
+                    }
+                    console.log(this.hero.weaponSlotIndex)
+                    console.log(this.hero.items.sword)
                 }
             }
             
@@ -818,6 +863,7 @@ export default class BaseScene extends Scene {
                 this.text.setText('');
             })
         }
+        // Hover over
         this.healingPotionPic.on('pointerover', function(pointer) {
             this.text.setText(`Click to drink healing potion`);
         })
@@ -864,6 +910,42 @@ export default class BaseScene extends Scene {
             this.scene.start(this.areaChangeTo.westChange, 
             {hero : this.hero, areaChangeType : "West", historyLogData : this.historyLineTextList, historyLogColor : this.historyLineTextColor});
         }
+
+        // Equipment
+        if (this.hero.weaponSlotIndex == 0) {
+            this.sword.y = -50;
+            this.zombieAxe.y = -50;
+        }
+
+        if (this.hero.items.sword == 1 && this.hero.weaponSlotIndex == 1) {
+            this.sword.x = 690;
+            this.sword.y = 405;
+            this.zombieAxe.y = -50;
+        }
+        if (this.hero.items.zombieAxe == 1 && this.hero.weaponSlotIndex == 2) {
+            this.zombieAxe.x = 690;
+            this.zombieAxe.y = 405;
+            this.sword.y = -50;
+        }
+
+        if (this.hero.items.helmet == 1) {
+            this.helmet = this.add.image(743, 362, 'helmet').setInteractive();
+        }
+        if (this.hero.items.shield == 1) {
+            this.shield = this.add.image(795, 405, 'shield').setInteractive();
+        }
+        if (this.hero.items.chainmail == 1) {
+            this.chainmail = this.add.image(743, 405, 'chainmail').setInteractive();
+        }
+
+        // Equipment
+        this.sword.on('pointerover', function(pointer) {
+            this.text.setText(`Click to remove sword`);
+        })
+        this.sword.on('pointerout', function(pointer) {
+            this.text.setText(``);
+        })
+        
     }
 
 }

@@ -31,3 +31,10 @@ exports.scrollDown = require('/assets/sprites/icons/scroll_down_button.gif');
 exports.radioButton = require('/assets/sprites/icons/radiobutton_circle.png');
 
 exports.healingPotionPic = require('/assets/sprites/icons/healing_potion.png');
+
+exports.sword = require('/assets/sprites/inventory/sword.png');
+exports.helmet = require('/assets/sprites/inventory/helmet.png');
+exports.shield = require('/assets/sprites/inventory/shield.png');
+exports.chainmail = require('/assets/sprites/inventory/chainmail.png');
+exports.zombieAxe = require('/assets/sprites/inventory/zombieAxe.png');
+// exports.dragonShield = require('/assets/sprites/inventory/dragonShield.png');
